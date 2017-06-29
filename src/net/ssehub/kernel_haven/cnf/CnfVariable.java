@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_haven.cnf;
+package net.ssehub.kernel_haven.cnf;
 
 /**
  * Represents an element of the CNF combining a negation (<b>true if negated</b>

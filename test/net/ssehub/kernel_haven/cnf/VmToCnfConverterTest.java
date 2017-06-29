@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_haven.cnf;
+package net.ssehub.kernel_haven.cnf;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -11,9 +11,9 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import de.uni_hildesheim.sse.kernel_haven.util.FormatException;
-import de.uni_hildesheim.sse.kernel_haven.variability_model.VariabilityModel;
-import de.uni_hildesheim.sse.kernel_haven.variability_model.VariabilityVariable;
+import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.variability_model.VariabilityModel;
+import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
 /**
  * This class tests if the VM is correctly convertet to Cnf.

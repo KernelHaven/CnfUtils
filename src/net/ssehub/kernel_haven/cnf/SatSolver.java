@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_haven.cnf;
+package net.ssehub.kernel_haven.cnf;
 
 import java.util.HashMap;
 import java.util.List;

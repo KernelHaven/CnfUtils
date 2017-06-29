@@ -1,6 +1,6 @@
-package de.uni_hildesheim.sse.kernel_haven.cnf;
+package net.ssehub.kernel_haven.cnf;
 
-import de.uni_hildesheim.sse.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.logic.Formula;
 
 /**
  * A converter to convert boolean {@link Formula}s to {@link Cnf}.

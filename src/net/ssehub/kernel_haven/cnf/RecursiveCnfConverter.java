@@ -1,15 +1,15 @@
-package de.uni_hildesheim.sse.kernel_haven.cnf;
+package net.ssehub.kernel_haven.cnf;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.kernel_haven.util.logic.Conjunction;
-import de.uni_hildesheim.sse.kernel_haven.util.logic.Disjunction;
-import de.uni_hildesheim.sse.kernel_haven.util.logic.False;
-import de.uni_hildesheim.sse.kernel_haven.util.logic.Formula;
-import de.uni_hildesheim.sse.kernel_haven.util.logic.Negation;
-import de.uni_hildesheim.sse.kernel_haven.util.logic.True;
-import de.uni_hildesheim.sse.kernel_haven.util.logic.Variable;
+import net.ssehub.kernel_haven.util.logic.Conjunction;
+import net.ssehub.kernel_haven.util.logic.Disjunction;
+import net.ssehub.kernel_haven.util.logic.False;
+import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.logic.Negation;
+import net.ssehub.kernel_haven.util.logic.True;
+import net.ssehub.kernel_haven.util.logic.Variable;
 
 /**
  * A CNF converter based on https://www.cs.jhu.edu/~jason/tutorials/convert-to-CNF.html

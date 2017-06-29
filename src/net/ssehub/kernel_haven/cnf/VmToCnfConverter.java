@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_haven.cnf;
+package net.ssehub.kernel_haven.cnf;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import de.uni_hildesheim.sse.kernel_haven.util.FormatException;
-import de.uni_hildesheim.sse.kernel_haven.variability_model.VariabilityModel;
-import de.uni_hildesheim.sse.kernel_haven.variability_model.VariabilityVariable;
+import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.variability_model.VariabilityModel;
+import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
 /**
  * This class is only for converting the VariabilityModel to a CNF Table. Then
