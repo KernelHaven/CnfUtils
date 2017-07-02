@@ -220,4 +220,26 @@ public class Cnf {
         return result.toString();
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 3244324;
+        
+        // sum op the hashes of the rows; this has the benefit that the order of the rows doesn't matter for hash
+        // (since it also doesn't matter for semantics)
+        for (List<CnfVariable> row : table) {
+            
+            // again, simply sum up the CnfVariables, since order doesn't matter semantically
+            for (CnfVariable variable : row) {
+                hash += variable.hashCode(); 
+            }
+        }
+        
+        return hash * 573495334;
+    }
+    
 }

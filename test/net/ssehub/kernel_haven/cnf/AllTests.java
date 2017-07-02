@@ -13,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
     SatSolverTest.class,
     CnfTest.class,
     CnfConverterTest.class,
+    CachedSatSolverTest.class,
     })
 public class AllTests {
 
