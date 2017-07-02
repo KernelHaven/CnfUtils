@@ -233,10 +233,14 @@ public class Cnf {
         // (since it also doesn't matter for semantics)
         for (List<CnfVariable> row : table) {
             
+            int lineHash = 675433;
+            
             // again, simply sum up the CnfVariables, since order doesn't matter semantically
             for (CnfVariable variable : row) {
-                hash += variable.hashCode(); 
+                lineHash += variable.hashCode(); 
             }
+            
+            hash += lineHash * 5434543;
         }
         
         return hash * 573495334;
