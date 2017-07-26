@@ -59,7 +59,10 @@
 				<include name="org/sat4j/**" />
 			</patternset>
 		</unzip>
-		<jar destfile="${jar.dir}/${jar.filename}" basedir="${classes.dir}" excludes="**/*Test.class, **/*Tests.class, **/package-info.class" />
+		<jar destfile="${jar.dir}/${jar.filename}" basedir="${classes.dir}" excludes="**/*Test.class, **/*Tests.class, **/package-info.class">
+			<!-- Overwrite BeanUtils of Sat4J as other plug-ins require a newer version of this plugin -->
+			<zipgroupfileset dir="lib" includes="commons-beanutils-1.9.3.jar"/>
+		</jar>
 	</target>
 
 	<target name="jarwithsources">
