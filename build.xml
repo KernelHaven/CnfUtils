@@ -124,7 +124,7 @@
 			<junit fork="yes" dir="${basedir}" failureProperty="test.failed">
 				<!-- Note the classpath order: instrumented classes are before the original 
 	                (uninstrumented) classes. This is important. -->
-				<classpath refid="classpath.project" />
+				<classpath refid="classpath.testing" />
 
 				<formatter type="xml" />
 				<test name="${testcase}" todir="${reports.xml.dir}" if="testcase" />
