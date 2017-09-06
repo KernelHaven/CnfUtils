@@ -62,16 +62,12 @@
 
 
 	<target name="jar">
-		<unzip src="${lib.dir}/sat4j-sat-2.3.4.jar" dest="${classes.dir}">
+		<unzip src="${lib.dir}/sat4j-core-2.3.5.jar" dest="${classes.dir}">
 			<patternset>
-				<include name="org/apache/**" />
 				<include name="org/sat4j/**" />
 			</patternset>
 		</unzip>
-		<jar destfile="${jar.dir}/${jar.filename}" basedir="${classes.dir}" excludes="**/package-info.class">
-			<!-- Overwrite BeanUtils of Sat4J as other plug-ins require a newer version of this plugin -->
-			<zipgroupfileset dir="lib" includes="commons-beanutils-1.9.3.jar"/>
-		</jar>
+		<jar destfile="${jar.dir}/${jar.filename}" basedir="${classes.dir}" excludes="**/package-info.class" />
 	</target>
 
 	<target name="jarwithsources">
