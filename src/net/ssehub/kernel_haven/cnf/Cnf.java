@@ -195,7 +195,7 @@ public class Cnf {
     public Formula asFormula() {
         VariableCache cache = new VariableCache();
         
-        Formula result = new True();
+        Formula result = True.INSTANCE;
         
         if (table.size() > 0) {
             result = rowAsFormula(table.get(0), cache);

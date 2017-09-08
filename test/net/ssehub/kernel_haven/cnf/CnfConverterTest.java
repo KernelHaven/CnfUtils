@@ -127,7 +127,7 @@ public class CnfConverterTest {
         // 0 | 1 | 0
         // 1 | 0 | 1
         // 1 | 1 | 0
-        Formula bool = new Disjunction(new Conjunction(a, new Negation(b)), new Negation(new True()));
+        Formula bool = new Disjunction(new Conjunction(a, new Negation(b)), new Negation(True.INSTANCE));
         
         Cnf cnf = converter.convert(bool);
         
