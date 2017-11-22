@@ -6,6 +6,7 @@ import org.junit.Test;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.Variable;
 
 /**
@@ -62,6 +63,18 @@ public class LogicUtilsTest {
     public void testANDSimplification() {
         Variable varA = new Variable("A");
         Formula complicated = new Conjunction(varA, varA);
+        Formula simplified = LogicUtils.simplify(complicated);
+        
+        Assert.assertSame(varA, simplified);
+    }
+    
+    /**
+     * Tests if doubled negated formulas can be simplified correctly.
+     */
+    @Test
+    public void testDoubleNotSimplification() {
+        Variable varA = new Variable("A");
+        Formula complicated = new Negation(new Negation(varA));
         Formula simplified = LogicUtils.simplify(complicated);
         
         Assert.assertSame(varA, simplified);

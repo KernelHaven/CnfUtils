@@ -9,6 +9,7 @@ import net.ssehub.kernel_haven.util.logic.Formula;
  * Utility functions for {@link Formula}s.
  * 
  * @author Adam
+ * @author El-Sharkawy
  */
 public class LogicUtils {
 

@@ -25,6 +25,7 @@ import net.ssehub.kernel_haven.util.logic.Variable;
  * Converter class between KernelHavens {@link Formula} and JBool_Expressions {@link Expression}.
  *  
  * @author Adam
+ * @author El-Sharkawy
  */
 class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>> {
     private Map<String, Variable> varMapping = new HashMap<>();
