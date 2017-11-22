@@ -1,7 +1,9 @@
 package net.ssehub.kernel_haven.logic_utils;
 
 import java.util.ArrayDeque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 
 import com.bpodgursky.jbool_expressions.And;
@@ -25,6 +27,7 @@ import net.ssehub.kernel_haven.util.logic.Variable;
  * @author Adam
  */
 class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>> {
+    private Map<String, Variable> varMapping = new HashMap<>();
 
     @Override
     public Expression<String> visitFalse(False falseConstant) {
@@ -38,6 +41,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
 
     @Override
     public Expression<String> visitVariable(Variable variable) {
+        varMapping.put(variable.getName(), variable);
         return com.bpodgursky.jbool_expressions.Variable.of(variable.getName());
     }
 
@@ -63,7 +67,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * 
      * @return The {@link Formula} that was created from the given expression. Not <code>null</code>.
      */
-    public static Formula expressionToFormula(Expression<String> expr) {
+    public Formula expressionToFormula(Expression<String> expr) {
         Formula result = null;
         
         if (expr instanceof Literal) {
@@ -75,10 +79,13 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
             result = translateAndExpression((And<String>) expr);
         } else if (expr instanceof Not) {
             result = new Negation(expressionToFormula(((Not<String>) expr).getE()));
-            
         } else if (expr instanceof com.bpodgursky.jbool_expressions.Variable) {
-            result = new Variable(((com.bpodgursky.jbool_expressions.Variable<String>) expr).getValue());
-            
+            String varName = ((com.bpodgursky.jbool_expressions.Variable<String>) expr).getValue();
+            result = varMapping.get(varName);
+            if (null == result) {
+                // Should not occur, except in tests. However, this is also a fallback.
+                result = new Variable(varName);
+            }
         } else {
             throw new RuntimeException("TODO"); // TODO
         }
@@ -91,7 +98,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * @param expr An OR expression to translate.
      * @return The translated formula.
      */
-    private static Formula translateOrExpression(Or<String> expr) {
+    private Formula translateOrExpression(Or<String> expr) {
         Formula result;
         List<Expression<String>> children = expr.getChildren();
         if (children.size() <= 1) {
@@ -134,7 +141,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * @param expr An OR expression to translate.
      * @return The translated formula.
      */
-    private static Formula translateAndExpression(And<String> expr) {
+    private Formula translateAndExpression(And<String> expr) {
         Formula result;
         List<Expression<String>> children = expr.getChildren();
         if (children.size() <= 1) {

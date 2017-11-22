@@ -28,9 +28,12 @@ public class LogicUtils {
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
     public static Formula simplify(Formula formula) {
-        Expression<String> expr = new FormulaToExpressionConverter().visit(formula);
-        expr = RuleSet.simplify(expr);
-        return FormulaToExpressionConverter.expressionToFormula(expr);
+        FormulaToExpressionConverter converter = new FormulaToExpressionConverter();
+        Expression<String> expr = converter.visit(formula);
+        Expression<String> translated = RuleSet.simplify(expr);
+        
+        // Re-translate and return simplified element only if there was something to simplify
+        return expr.equals(translated) ? formula : converter.expressionToFormula(translated);
     }
     
 }

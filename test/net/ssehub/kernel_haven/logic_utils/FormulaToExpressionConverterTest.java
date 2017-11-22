@@ -28,7 +28,7 @@ public class FormulaToExpressionConverterTest {
         Expression<String> multiOr = Or.of(Variable.of("A"), Variable.of("B"));
         Assert.assertNotNull(multiOr);
         
-        Formula translated = FormulaToExpressionConverter.expressionToFormula(multiOr);
+        Formula translated = new FormulaToExpressionConverter().expressionToFormula(multiOr);
         Assert.assertEquals("A || B", translated.toString());
     }
     
@@ -42,7 +42,7 @@ public class FormulaToExpressionConverterTest {
         Expression<String> multiOr = Or.of(Variable.of("A"), Variable.of("B"), Variable.of("C"));
         Assert.assertNotNull(multiOr);
         
-        Formula translated = FormulaToExpressionConverter.expressionToFormula(multiOr);
+        Formula translated = new FormulaToExpressionConverter().expressionToFormula(multiOr);
         Assert.assertEquals("A || B || C", translated.toString());
     }
     
@@ -56,7 +56,7 @@ public class FormulaToExpressionConverterTest {
         Expression<String> multiOr = Or.of(Variable.of("A"), Variable.of("B"), Variable.of("C"), Variable.of("D"));
         Assert.assertNotNull(multiOr);
         
-        Formula translated = FormulaToExpressionConverter.expressionToFormula(multiOr);
+        Formula translated = new FormulaToExpressionConverter().expressionToFormula(multiOr);
         Assert.assertEquals("A || B || C || D", translated.toString());
     }
     
@@ -70,7 +70,7 @@ public class FormulaToExpressionConverterTest {
         Expression<String> multiOr = And.of(Variable.of("A"), Variable.of("B"));
         Assert.assertNotNull(multiOr);
         
-        Formula translated = FormulaToExpressionConverter.expressionToFormula(multiOr);
+        Formula translated = new FormulaToExpressionConverter().expressionToFormula(multiOr);
         Assert.assertEquals("A && B", translated.toString());
     }
     
@@ -84,7 +84,7 @@ public class FormulaToExpressionConverterTest {
         Expression<String> multiOr = And.of(Variable.of("A"), Variable.of("B"), Variable.of("C"));
         Assert.assertNotNull(multiOr);
         
-        Formula translated = FormulaToExpressionConverter.expressionToFormula(multiOr);
+        Formula translated = new FormulaToExpressionConverter().expressionToFormula(multiOr);
         Assert.assertEquals("A && B && C", translated.toString());
     }    
 }
