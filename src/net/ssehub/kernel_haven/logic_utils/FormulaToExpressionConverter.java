@@ -1,6 +1,8 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import java.util.ArrayDeque;
 import java.util.List;
+import java.util.Queue;
 
 import com.bpodgursky.jbool_expressions.And;
 import com.bpodgursky.jbool_expressions.Expression;
@@ -68,19 +70,9 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
             result = (((Literal<String>) expr).getValue()) ? True.INSTANCE : False.INSTANCE;
             
         } else if (expr instanceof Or) {
-            List<Expression<String>> children = ((Or<String>) expr).getChildren();
-            if (children.size() != 2) {
-                throw new RuntimeException("TODO"); // TODO
-            }
-            result = new Disjunction(expressionToFormula(children.get(0)), expressionToFormula(children.get(1)));
-            
+            result = translateOrExpression((Or<String>) expr);
         } else if (expr instanceof And) {
-            List<Expression<String>> children = ((And<String>) expr).getChildren();
-            if (children.size() != 2) {
-                throw new RuntimeException("TODO"); // TODO
-            }
-            result = new Conjunction(expressionToFormula(children.get(0)), expressionToFormula(children.get(1)));
-            
+            result = translateAndExpression((And<String>) expr);
         } else if (expr instanceof Not) {
             result = new Negation(expressionToFormula(((Not<String>) expr).getE()));
             
@@ -89,6 +81,92 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
             
         } else {
             throw new RuntimeException("TODO"); // TODO
+        }
+        
+        return result;
+    }
+
+    /**
+     * Part of the {@link #expressionToFormula(Expression)} method to translate OR expressions.
+     * @param expr An OR expression to translate.
+     * @return The translated formula.
+     */
+    private static Formula translateOrExpression(Or<String> expr) {
+        Formula result;
+        List<Expression<String>> children = expr.getChildren();
+        if (children.size() <= 1) {
+            throw new RuntimeException("TODO"); // TODO                
+        } else if (children.size() == 2 ) {
+            // Special case: 2 elements can directly be translated (safe memory instead of using generic approach)
+            result = new Disjunction(expressionToFormula(children.get(0)), expressionToFormula(children.get(1)));
+        } else {
+            /*
+             *  jbool_expressions allows OR and AND expressions with more than two elements
+             *  -> Try to keep the tree as flat as possible
+             */
+            Queue<Formula> translatedElements = new ArrayDeque<>();
+            Formula lastElement = null;
+            for (int i = 0; i < children.size(); i++) {
+                Formula translatedChild = expressionToFormula(children.get(i));                    
+                if (null == lastElement) {
+                    lastElement = translatedChild;
+                } else {
+                    translatedElements.add(new Disjunction(lastElement, translatedChild));
+                    lastElement = null;
+                }
+            }
+            // Consider situations with an odd number of elements
+            if (null != lastElement) {
+                translatedElements.add(lastElement);
+            }
+            // Create binary tree, as balanced as possible
+            while (translatedElements.size() > 1) {
+                translatedElements.add(new Disjunction(translatedElements.poll(), translatedElements.poll()));
+            }
+            result = translatedElements.poll();
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Part of the {@link #expressionToFormula(Expression)} method to translate AND expressions.
+     * @param expr An OR expression to translate.
+     * @return The translated formula.
+     */
+    private static Formula translateAndExpression(And<String> expr) {
+        Formula result;
+        List<Expression<String>> children = expr.getChildren();
+        if (children.size() <= 1) {
+            throw new RuntimeException("TODO"); // TODO                
+        } else if (children.size() == 2 ) {
+            // Special case: 2 elements can directly be translated (safe memory instead of using generic approach)
+            result = new Conjunction(expressionToFormula(children.get(0)), expressionToFormula(children.get(1)));
+        } else {
+            /*
+             *  jbool_expressions allows OR and AND expressions with more than two elements
+             *  -> Try to keep the tree as flat as possible
+             */
+            Queue<Formula> translatedElements = new ArrayDeque<>();
+            Formula lastElement = null;
+            for (int i = 0; i < children.size(); i++) {
+                Formula translatedChild = expressionToFormula(children.get(i));                    
+                if (null == lastElement) {
+                    lastElement = translatedChild;
+                } else {
+                    translatedElements.add(new Conjunction(lastElement, translatedChild));
+                    lastElement = null;
+                }
+            }
+            // Consider situations with an odd number of elements
+            if (null != lastElement) {
+                translatedElements.add(lastElement);
+            }
+            // Create binary tree, as balanced as possible
+            while (translatedElements.size() > 1) {
+                translatedElements.add(new Conjunction(translatedElements.poll(), translatedElements.poll()));
+            }
+            result = translatedElements.poll();
         }
         
         return result;

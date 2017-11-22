@@ -5,7 +5,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * All test class.
+ * Test suite for CNF package.
  */
 @RunWith(Suite.class)
 @SuiteClasses({
@@ -15,6 +15,6 @@ import org.junit.runners.Suite.SuiteClasses;
     CnfConverterTest.class,
     CachedSatSolverTest.class,
     })
-public class AllTests {
+public class AllCNFTests {
 
 }
