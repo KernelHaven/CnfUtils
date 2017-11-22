@@ -9,6 +9,6 @@
 	<classpathentry kind="lib" path="lib/include/commons-lang-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-lang3-3.6.jar"/>
 	<classpathentry kind="lib" path="lib/include/guava-14.0.jar"/>
-	<classpathentry kind="lib" path="lib/include/jbool_expressions-1.13.jar"/>
+	<classpathentry kind="lib" path="lib/include/jbool_expressions-1.13.jar" sourcepath="lib/jbool_expressions-jbool_expressions-1.13.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
