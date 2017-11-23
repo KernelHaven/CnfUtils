@@ -3,6 +3,8 @@ package net.ssehub.kernel_haven.logic_utils;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
+import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.logic.Formula;
 
 /**
@@ -34,7 +36,21 @@ public class LogicUtils {
         Expression<String> translated = RuleSet.simplify(expr);
         
         // Re-translate and return simplified element only if there was something to simplify
-        return expr.equals(translated) ? formula : converter.expressionToFormula(translated);
+        Formula result;
+        if (expr.equals(translated)) {
+            // Optimization: If nothing was simplified, do not re-translate expression
+            result = formula;
+        } else {
+            // There was an optimization
+            try {
+                result = converter.expressionToFormula(translated);
+            } catch (FormatException e) {
+                Logger.get().logExceptionInfo("Could not simplifiy formula: " + formula.toString(), e);
+                // Keep old result (even if it can be simplified)
+                result = formula;
+            }
+        }
+        return result;
     }
     
 }

@@ -12,6 +12,7 @@ import com.bpodgursky.jbool_expressions.Literal;
 import com.bpodgursky.jbool_expressions.Not;
 import com.bpodgursky.jbool_expressions.Or;
 
+import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.False;
@@ -67,8 +68,9 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * @param expr The expression to convert. Must not be <code>null</code>.
      * 
      * @return The {@link Formula} that was created from the given expression. Not <code>null</code>.
+     * @throws FormatException If the formula could not be parsed correctly.
      */
-    public Formula expressionToFormula(Expression<String> expr) {
+    public Formula expressionToFormula(Expression<String> expr) throws FormatException {
         Formula result = null;
         
         if (expr instanceof Literal) {
@@ -88,7 +90,8 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
                 result = new Variable(varName);
             }
         } else {
-            throw new RuntimeException("TODO"); // TODO
+            throw new FormatException("Could not parse \"" + expr + "\", due an unexpected element of type: "
+                + expr.getClass());
         }
         
         return result;
@@ -98,12 +101,15 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * Part of the {@link #expressionToFormula(Expression)} method to translate OR expressions.
      * @param expr An OR expression to translate.
      * @return The translated formula.
+     * @throws FormatException If the formula could not be parsed correctly.
      */
-    private Formula translateOrExpression(Or<String> expr) {
+    private Formula translateOrExpression(Or<String> expr) throws FormatException {
         Formula result;
         List<Expression<String>> children = expr.getChildren();
-        if (children.size() <= 1) {
-            throw new RuntimeException("TODO"); // TODO                
+        if (children.size() < 1) {
+            result = True.INSTANCE;
+        } else if (children.size() == 1) {
+            result = expressionToFormula(children.get(0));
         } else if (children.size() == 2 ) {
             // Special case: 2 elements can directly be translated (safe memory instead of using generic approach)
             result = new Disjunction(expressionToFormula(children.get(0)), expressionToFormula(children.get(1)));
@@ -141,12 +147,15 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * Part of the {@link #expressionToFormula(Expression)} method to translate AND expressions.
      * @param expr An OR expression to translate.
      * @return The translated formula.
+     * @throws FormatException If the formula could not be parsed correctly.
      */
-    private Formula translateAndExpression(And<String> expr) {
+    private Formula translateAndExpression(And<String> expr) throws FormatException {
         Formula result;
         List<Expression<String>> children = expr.getChildren();
-        if (children.size() <= 1) {
-            throw new RuntimeException("TODO"); // TODO                
+        if (children.size() < 1) {
+            result = True.INSTANCE;
+        } else if (children.size() == 1) {
+            result = expressionToFormula(children.get(0));
         } else if (children.size() == 2 ) {
             // Special case: 2 elements can directly be translated (safe memory instead of using generic approach)
             result = new Conjunction(expressionToFormula(children.get(0)), expressionToFormula(children.get(1)));
