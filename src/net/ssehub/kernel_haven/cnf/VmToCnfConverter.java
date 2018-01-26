@@ -1,5 +1,8 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNullArrayWithNotNullContent;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
 import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
@@ -22,9 +26,9 @@ import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
  */
 public class VmToCnfConverter {
 
-    public static final String CNF_START_INDICATOR = "p cnf";
+    public static final @NonNull String CNF_START_INDICATOR = "p cnf";
 
-    public static final String ROW_DELIMITER = " ";
+    public static final @NonNull String ROW_DELIMITER = " ";
     
     public static final int CNF_START_LINE_LENGTH = 4;
     
@@ -43,7 +47,7 @@ public class VmToCnfConverter {
      * 
      * @throws FormatException If the constraint model file of the {@link VariabilityModel} is not a DIMACS file.
      */
-    public Cnf convertVmToCnf(VariabilityModel vm) throws FormatException {
+    public @NonNull Cnf convertVmToCnf(@NonNull VariabilityModel vm) throws FormatException {
         File dimacsModel = vm.getConstraintModel();
         Cnf cnf = null;
         Map<Integer, String> vmMap = getMapOfVM(vm);
@@ -62,28 +66,30 @@ public class VmToCnfConverter {
             
             String[] startline = line.split(ROW_DELIMITER);
             if (startline.length == CNF_START_LINE_LENGTH) {
-                // p cnf 2 4
-                int initialLenght = Integer.parseInt(startline[3]);
-                cnf = new Cnf(initialLenght);
+                throw new FormatException("Invalid \"p cnf\" line: " + line);
+            }
+            
+            // p cnf 2 4
+            int initialLenght = Integer.parseInt(startline[3]);
+            cnf = new Cnf(initialLenght);
+            
+            int maxNumber = Integer.parseInt(startline[2]);
+            
+            line = br.readLine();
+            int count = 0;
+            while (line != null) {
+                count++;
+                if (count > initialLenght) {
+                    throw new FormatException("Too many lines found");
+                }
                 
-                int maxNumber = Integer.parseInt(startline[2]);
+                cnf.addRow(parseLine(line, vmMap, maxNumber));
                 
                 line = br.readLine();
-                int count = 0;
-                while (line != null) {
-                    count++;
-                    if (count > initialLenght) {
-                        throw new FormatException("Too many lines found");
-                    }
-                    
-                    cnf.addRow(parseLine(line, vmMap, maxNumber));
-                    
-                    line = br.readLine();
-                }
-                
-                if (count < initialLenght) {
-                    throw new FormatException("Too few lines found");
-                }
+            }
+            
+            if (count < initialLenght) {
+                throw new FormatException("Too few lines found");
             }
         } catch (NumberFormatException e) {
             throw new FormatException("Error parsing number: " + e.getMessage());
@@ -112,8 +118,9 @@ public class VmToCnfConverter {
      * @return The CNF line.
      * @throws FormatException If the format is wrong.
      */
-    private CnfVariable[] parseLine(String line, Map<Integer, String> vmMap, int maxNumber)
-            throws FormatException {
+    private @NonNull CnfVariable @NonNull [] parseLine(@NonNull String line, @NonNull Map<Integer, String> vmMap,
+            int maxNumber) throws FormatException {
+        
         String[] dimacsModelLine = line.split(ROW_DELIMITER);
         CnfVariable[] cnfRow = new CnfVariable[dimacsModelLine.length - 1];
         for (int i = 0; i < dimacsModelLine.length - 1; i++) {
@@ -129,12 +136,12 @@ public class VmToCnfConverter {
                 // we have no mapping, so just generate a number
                 cnfRow[i] = new CnfVariable(isNot, "VARIABLE_" + absolutDimacsNumber);
             } else {
-                cnfRow[i] = new CnfVariable(isNot, vmMap.get(absolutDimacsNumber));
+                cnfRow[i] = new CnfVariable(isNot, notNull(vmMap.get(absolutDimacsNumber)));
             }
             
             
         }
-        return cnfRow;
+        return notNullArrayWithNotNullContent(cnfRow); // the loop makes sure that every entry is filled with non null
     }
     
 
@@ -144,7 +151,7 @@ public class VmToCnfConverter {
      * @param vm the Variability Model.
      * @return a Map with the DimacsNumber as Key and the VariableName as Value.
      */
-    private Map<Integer, String> getMapOfVM(VariabilityModel vm) {
+    private @NonNull Map<Integer, String> getMapOfVM(@NonNull VariabilityModel vm) {
         Set<VariabilityVariable> set = vm.getVariables();
         HashMap<Integer, String> map = new HashMap<>();
         for (VariabilityVariable variabilityVariable : set) {

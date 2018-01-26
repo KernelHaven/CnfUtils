@@ -3,6 +3,8 @@ package net.ssehub.kernel_haven.cnf;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+
 /**
  * A SAT solver that caches results.
  *
@@ -12,7 +14,7 @@ public class CachedSatSolver extends SatSolver {
 
     private int cacheSize;
     
-    private Map<Cnf, Boolean> cache;
+    private @NonNull Map<Cnf, Boolean> cache;
     
     /**
      * Creates a new {@link CachedSatSolver} with unlimited cache size.
@@ -27,7 +29,7 @@ public class CachedSatSolver extends SatSolver {
      * 
      * @param cnf The base CNF.
      */
-    public CachedSatSolver(Cnf cnf) {
+    public CachedSatSolver(@NonNull Cnf cnf) {
         super(cnf);
         cache = new HashMap<>();
     }
@@ -50,13 +52,13 @@ public class CachedSatSolver extends SatSolver {
      * @param cnf The base CNF.
      * @param cacheSize The maximum number of cache entries to store.
      */
-    public CachedSatSolver(Cnf cnf, int cacheSize) {
+    public CachedSatSolver(@NonNull Cnf cnf, int cacheSize) {
         this(cnf);
         this.cacheSize = cacheSize;
     }
     
     @Override
-    public boolean isSatisfiable(Cnf cnf) throws SolverException {
+    public boolean isSatisfiable(@NonNull Cnf cnf) throws SolverException {
         
         Boolean result = cache.get(cnf);
         

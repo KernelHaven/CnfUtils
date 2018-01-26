@@ -5,6 +5,7 @@ import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.Variable;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * Introduces new variables to simplify overall constraint.
@@ -21,7 +22,7 @@ public class RecursiveReplacingCnfConverter extends RecursiveCnfConverter {
     private int uniqueCounter = 1;
     
     @Override
-    protected Cnf handleOr(Disjunction call) throws ConverterException {
+    protected @NonNull Cnf handleOr(@NonNull Disjunction call) throws ConverterException {
         /*
          * We have call = P v Q
          * 
@@ -59,7 +60,7 @@ public class RecursiveReplacingCnfConverter extends RecursiveCnfConverter {
      * @return <tt>true</tt> if tree contains more than one variable
      * @throws ConverterException If the formula contains unexpected elements.
      */
-    private boolean isComplex(Formula tree) throws ConverterException {
+    private boolean isComplex(@NonNull Formula tree) throws ConverterException {
         boolean result;
         
         if (tree instanceof Variable) {

@@ -1,11 +1,14 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * Utility functions for {@link Formula}s.
@@ -15,6 +18,8 @@ import net.ssehub.kernel_haven.util.logic.Formula;
  */
 public class LogicUtils {
 
+    private static final Logger LOGGER = Logger.get();
+    
     /**
      * Don't allow instances.
      */
@@ -30,10 +35,10 @@ public class LogicUtils {
      * @see <a href="https://github.com/bpodgursky/jbool_expressions">
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
-    public static Formula simplify(Formula formula) {
+    public static @NonNull Formula simplify(@NonNull Formula formula) {
         FormulaToExpressionConverter converter = new FormulaToExpressionConverter();
         Expression<String> expr = converter.visit(formula);
-        Expression<String> translated = RuleSet.simplify(expr);
+        Expression<String> translated = notNull(RuleSet.simplify(expr));
         
         // Re-translate and return simplified element only if there was something to simplify
         Formula result;
@@ -45,7 +50,7 @@ public class LogicUtils {
             try {
                 result = converter.expressionToFormula(translated);
             } catch (FormatException e) {
-                Logger.get().logExceptionInfo("Could not simplifiy formula: " + formula.toString(), e);
+                LOGGER.logExceptionInfo("Could not simplifiy formula: " + formula.toString(), e);
                 // Keep old result (even if it can be simplified)
                 result = formula;
             }

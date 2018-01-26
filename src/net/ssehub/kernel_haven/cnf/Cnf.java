@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,6 +14,8 @@ import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.parser.VariableCache;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * The Class Cnf Represents a CNF Table for CNF with CnfVariables as elements.
@@ -29,7 +33,7 @@ public class Cnf {
      * The internal representation of the Cnf. The Variables in each row is
      * conjuncted. A row to each other row is disjunct.
      */
-    private List<List<CnfVariable>> table;
+    private @NonNull List<@NonNull List<@NonNull CnfVariable>> table;
 
     /**
      * Initializes the Cnf with an ArrayList with an initial length. This is
@@ -56,8 +60,8 @@ public class Cnf {
      * @param row
      *            is the row with the CnfVariables to be added.
      */
-    public void addRow(CnfVariable... row) {
-        this.table.add(Arrays.asList(row));
+    public void addRow(@NonNull CnfVariable @NonNull ... row) {
+        this.table.add(notNull(Arrays.asList(row)));
     }
 
     /**
@@ -68,9 +72,9 @@ public class Cnf {
      *            the existing row index. Not null.
      * @return the row. Not null.
      */
-    public List<CnfVariable> getRow(int row) {
-        List<CnfVariable> toReturn = null;
-        toReturn = table.get(row);
+    public @NonNull List<@NonNull CnfVariable> getRow(int row) {
+        List<@NonNull CnfVariable> toReturn = null;
+        toReturn = notNull(table.get(row));
         return toReturn;
     }
 
@@ -83,9 +87,9 @@ public class Cnf {
      *            is the number of the element. Must not be null.
      * @return the element which is a single cnf variable.
      */
-    public CnfVariable getElement(int row, int number) {
+    public @NonNull CnfVariable getElement(int row, int number) {
         CnfVariable toReturn = null;
-        toReturn = table.get(row).get(number);
+        toReturn = notNull(notNull(table.get(row)).get(number));
         return toReturn;
     }
 
@@ -94,7 +98,7 @@ public class Cnf {
      *
      * @return the table of variables.
      */
-    public List<List<CnfVariable>> getTable() {
+    public @NonNull List<@NonNull List<@NonNull CnfVariable>> getTable() {
         return table;
     }
 
@@ -127,8 +131,8 @@ public class Cnf {
      * 
      * @return all variable names as a set. Not null.
      */
-    public Set<String> getAllVarNames() {
-        Set<String> allVars = new HashSet<>();
+    public @NonNull Set<@NonNull String> getAllVarNames() {
+        Set<@NonNull String> allVars = new HashSet<>();
         for (List<CnfVariable> arrayList : table) {
             for (CnfVariable cnfVariable : arrayList) {
                 allVars.add(cnfVariable.getName());
@@ -146,13 +150,13 @@ public class Cnf {
      *            <code>null</code>.
      * @return a new cnf.
      */
-    public Cnf combine(Cnf cnf) {
+    public @NonNull Cnf combine(@NonNull Cnf cnf) {
         Cnf result = new Cnf(cnf.getRowCount() + this.getRowCount());
         for (List<CnfVariable> list : table) {
-            result.addRow(list.toArray(new CnfVariable[0]));
+            result.addRow(notNull(list.toArray(new @NonNull CnfVariable[0])));
         }
         for (List<CnfVariable> list : cnf.table) {
-            result.addRow(list.toArray(new CnfVariable[0]));
+            result.addRow(notNull(list.toArray(new @NonNull CnfVariable[0])));
         }
         return result;
     }
@@ -164,7 +168,7 @@ public class Cnf {
      * @param cache The cache to create variables from.
      * @return The formula representing the (possibly negated) variable.
      */
-    private Formula variableAsFormula(CnfVariable variable, VariableCache cache) {
+    private @NonNull Formula variableAsFormula(@NonNull CnfVariable variable, @NonNull VariableCache cache) {
         Formula result = cache.getVariable(variable.getName());
         if (variable.isNegation()) {
             result = new Negation(result);
@@ -179,7 +183,7 @@ public class Cnf {
      * @param cache The cache to create variables from.
      * @return The formula representing the given row.
      */
-    private Formula rowAsFormula(List<CnfVariable> row, VariableCache cache) {
+    private @NonNull Formula rowAsFormula(@NonNull List<@NonNull CnfVariable> row, @NonNull VariableCache cache) {
         Formula result = variableAsFormula(row.get(0), cache);
         for (int i = 1; i < row.size(); i++) {
             result = new Disjunction(result, variableAsFormula(row.get(i), cache));
@@ -192,7 +196,7 @@ public class Cnf {
      * 
      * @return This CNF as a boolean formula.
      */
-    public Formula asFormula() {
+    public @NonNull Formula asFormula() {
         VariableCache cache = new VariableCache();
         
         Formula result = True.INSTANCE;
@@ -210,18 +214,18 @@ public class Cnf {
     }
     
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         StringBuffer result = new StringBuffer();
         
         for (List<CnfVariable> row : table) {
             result.append(row).append("\n");
         }
         
-        return result.toString();
+        return notNull(result.toString());
     }
     
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return super.equals(obj);
     }
     

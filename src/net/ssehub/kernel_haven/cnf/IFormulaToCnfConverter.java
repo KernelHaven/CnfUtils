@@ -1,6 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * A converter to convert boolean {@link Formula}s to {@link Cnf}.
@@ -18,6 +19,6 @@ public interface IFormulaToCnfConverter {
      * 
      * @throws ConverterException If the conversion fails.
      */
-    public Cnf convert(Formula formula) throws ConverterException;
+    public @NonNull Cnf convert(@NonNull Formula formula) throws ConverterException;
 
 }

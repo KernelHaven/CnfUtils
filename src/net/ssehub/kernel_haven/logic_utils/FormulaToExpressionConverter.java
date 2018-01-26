@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import net.ssehub.kernel_haven.util.logic.IFormulaVisitor;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * Converter class between KernelHavens {@link Formula} and JBool_Expressions {@link Expression}.
@@ -28,38 +31,38 @@ import net.ssehub.kernel_haven.util.logic.Variable;
  * @author Adam
  * @author El-Sharkawy
  */
-class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>> {
+class FormulaToExpressionConverter implements IFormulaVisitor<@NonNull Expression<String>> {
     private Map<String, Variable> varMapping = new HashMap<>();
 
     @Override
-    public Expression<String> visitFalse(False falseConstant) {
-        return Literal.getFalse();
+    public @NonNull Expression<String> visitFalse(@NonNull False falseConstant) {
+        return notNull(Literal.getFalse());
     }
 
     @Override
-    public Expression<String> visitTrue(True trueConstant) {
-        return Literal.getTrue();
+    public @NonNull Expression<String> visitTrue(@NonNull True trueConstant) {
+        return notNull(Literal.getTrue());
     }
 
     @Override
-    public Expression<String> visitVariable(Variable variable) {
+    public @NonNull Expression<String> visitVariable(@NonNull Variable variable) {
         varMapping.put(variable.getName(), variable);
-        return com.bpodgursky.jbool_expressions.Variable.of(variable.getName());
+        return notNull(com.bpodgursky.jbool_expressions.Variable.of(variable.getName()));
     }
 
     @Override
-    public Expression<String> visitNegation(Negation formula) {
-        return Not.of(visit(formula.getFormula()));
+    public @NonNull Expression<String> visitNegation(@NonNull Negation formula) {
+        return notNull(Not.of(visit(formula.getFormula())));
     }
 
     @Override
-    public Expression<String> visitDisjunction(Disjunction formula) {
-        return Or.of(visit(formula.getLeft()), visit(formula.getRight()));
+    public @NonNull Expression<String> visitDisjunction(@NonNull Disjunction formula) {
+        return notNull(Or.of(visit(formula.getLeft()), visit(formula.getRight())));
     }
 
     @Override
-    public Expression<String> visitConjunction(Conjunction formula) {
-        return And.of(visit(formula.getLeft()), visit(formula.getRight()));
+    public @NonNull Expression<String> visitConjunction(@NonNull Conjunction formula) {
+        return notNull(And.of(visit(formula.getLeft()), visit(formula.getRight())));
     }
     
     /**
@@ -70,7 +73,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * @return The {@link Formula} that was created from the given expression. Not <code>null</code>.
      * @throws FormatException If the formula could not be parsed correctly.
      */
-    public Formula expressionToFormula(Expression<String> expr) throws FormatException {
+    public @NonNull Formula expressionToFormula(@NonNull Expression<String> expr) throws FormatException {
         Formula result = null;
         
         if (expr instanceof Literal) {
@@ -81,9 +84,9 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
         } else if (expr instanceof And) {
             result = translateAndExpression((And<String>) expr);
         } else if (expr instanceof Not) {
-            result = new Negation(expressionToFormula(((Not<String>) expr).getE()));
+            result = new Negation(expressionToFormula(notNull(((Not<String>) expr).getE())));
         } else if (expr instanceof com.bpodgursky.jbool_expressions.Variable) {
-            String varName = ((com.bpodgursky.jbool_expressions.Variable<String>) expr).getValue();
+            String varName = notNull(((com.bpodgursky.jbool_expressions.Variable<String>) expr).getValue());
             result = varMapping.get(varName);
             if (null == result) {
                 // Should not occur, except in tests. However, this is also a fallback.
@@ -103,9 +106,10 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * @return The translated formula.
      * @throws FormatException If the formula could not be parsed correctly.
      */
-    private Formula translateOrExpression(Or<String> expr) throws FormatException {
+    private @NonNull Formula translateOrExpression(@NonNull Or<String> expr) throws FormatException {
         Formula result;
-        List<Expression<String>> children = expr.getChildren();
+        @SuppressWarnings("null") // childreen are never null
+        List<@NonNull Expression<String>> children = expr.getChildren();
         if (children.size() < 1) {
             result = True.INSTANCE;
         } else if (children.size() == 1) {
@@ -118,7 +122,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
              *  jbool_expressions allows OR and AND expressions with more than two elements
              *  -> Try to keep the tree as flat as possible
              */
-            Queue<Formula> translatedElements = new ArrayDeque<>();
+            Queue<@NonNull Formula> translatedElements = new ArrayDeque<>();
             Formula lastElement = null;
             for (int i = 0; i < children.size(); i++) {
                 Formula translatedChild = expressionToFormula(children.get(i));                    
@@ -137,7 +141,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
             while (translatedElements.size() > 1) {
                 translatedElements.add(new Disjunction(translatedElements.poll(), translatedElements.poll()));
             }
-            result = translatedElements.poll();
+            result = notNull(translatedElements.poll());
         }
         
         return result;
@@ -149,9 +153,10 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
      * @return The translated formula.
      * @throws FormatException If the formula could not be parsed correctly.
      */
-    private Formula translateAndExpression(And<String> expr) throws FormatException {
+    private @NonNull Formula translateAndExpression(@NonNull And<String> expr) throws FormatException {
         Formula result;
-        List<Expression<String>> children = expr.getChildren();
+        @SuppressWarnings("null") // childreen are never null
+        List<@NonNull Expression<String>> children = expr.getChildren();
         if (children.size() < 1) {
             result = True.INSTANCE;
         } else if (children.size() == 1) {
@@ -164,7 +169,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
              *  jbool_expressions allows OR and AND expressions with more than two elements
              *  -> Try to keep the tree as flat as possible
              */
-            Queue<Formula> translatedElements = new ArrayDeque<>();
+            Queue<@NonNull Formula> translatedElements = new ArrayDeque<>();
             Formula lastElement = null;
             for (int i = 0; i < children.size(); i++) {
                 Formula translatedChild = expressionToFormula(children.get(i));                    
@@ -183,7 +188,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<Expression<String>
             while (translatedElements.size() > 1) {
                 translatedElements.add(new Conjunction(translatedElements.poll(), translatedElements.poll()));
             }
-            result = translatedElements.poll();
+            result = notNull(translatedElements.poll());
         }
         
         return result;

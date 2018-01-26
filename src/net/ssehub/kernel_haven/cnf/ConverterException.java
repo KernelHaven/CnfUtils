@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
+
 /**
  * Thrown by converters for boolean formulas if they fail.
  * 
@@ -15,7 +17,7 @@ public class ConverterException extends Exception {
      * 
      * @param message The message to display.
      */
-    public ConverterException(String message) {
+    public ConverterException(@Nullable String message) {
         super(message);
     }
     
@@ -24,7 +26,7 @@ public class ConverterException extends Exception {
      * 
      * @param cause The cause of this exception.
      */
-    public ConverterException(Throwable cause) {
+    public ConverterException(@Nullable Throwable cause) {
         super(cause);
     }
     
@@ -34,7 +36,7 @@ public class ConverterException extends Exception {
      * @param message The message to display.
      * @param cause The cause of this exception.
      */
-    public ConverterException(String message, Throwable cause) {
+    public ConverterException(@Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
     }
     

@@ -10,6 +10,7 @@ import com.bpodgursky.jbool_expressions.Variable;
 
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 
 /**
@@ -94,7 +95,7 @@ public class FormulaToExpressionConverterTest {
      * @param expression The input expression of a test to translate.
      * @return The translated Formula
      */
-    private Formula translateFormula(Expression<String> expression) {
+    private Formula translateFormula(@NonNull Expression<String> expression) {
         Formula translated = null;
         try {
             translated = new FormulaToExpressionConverter().expressionToFormula(expression);

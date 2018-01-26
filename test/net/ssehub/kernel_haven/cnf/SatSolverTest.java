@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+
 /**
  * Tests the {@link SatSolver} class.
  *
@@ -8,12 +10,12 @@ package net.ssehub.kernel_haven.cnf;
 public class SatSolverTest extends AbstractSatSolverTest {
 
     @Override
-    protected SatSolver createSatSolver() {
+    protected @NonNull SatSolver createSatSolver() {
         return new SatSolver();
     }
 
     @Override
-    protected SatSolver createSatSolver(Cnf cnf) {
+    protected @NonNull SatSolver createSatSolver(@NonNull Cnf cnf) {
         return new SatSolver(cnf);
     }
 

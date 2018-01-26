@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+
 /**
  * Factory for creating FormulaToCnfConverters.
  * 
@@ -33,7 +35,7 @@ public class FormulaToCnfConverterFactory {
      * @param strategy The strategy to use.
      * @return A {@link IFormulaToCnfConverter} using the given strategy.
      */
-    public static IFormulaToCnfConverter create(Strategy strategy) {
+    public static @NonNull IFormulaToCnfConverter create(@NonNull Strategy strategy) {
         IFormulaToCnfConverter result;
         
         switch (strategy) {
@@ -46,8 +48,7 @@ public class FormulaToCnfConverterFactory {
             break;
             
         default:
-            result = null;
-            break;
+            throw new RuntimeException("Unkown strategy: " + strategy);
         }
         
         return result;
@@ -59,7 +60,7 @@ public class FormulaToCnfConverterFactory {
      * 
      * @return A {@link IFormulaToCnfConverter} using the default strategy.
      */
-    public static IFormulaToCnfConverter create() {
+    public static @NonNull IFormulaToCnfConverter create() {
         return create(Strategy.RECURISVE);
     }
     

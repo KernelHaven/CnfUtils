@@ -12,6 +12,7 @@ import java.util.Set;
 import org.junit.Test;
 
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
 import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
@@ -36,7 +37,8 @@ public class VmToCnfConverterTest {
     public void testCompleteVariableUse() throws FormatException {
         // Preconditions
         Set<VariabilityVariable> set = new HashSet<VariabilityVariable>();
-        String[] variables = {"ALPHA", "ALPHA_MODULE", "GAMMA", "BETA_MODULE", "BETA"};
+        @SuppressWarnings("null")
+        @NonNull String[] variables = {"ALPHA", "ALPHA_MODULE", "GAMMA", "BETA_MODULE", "BETA"};
         for (int i = 0; i < variables.length; i++) {
             set.add(new VariabilityVariable(variables[i], "bool", i + 1));
         }
@@ -148,6 +150,7 @@ public class VmToCnfConverterTest {
      * 
      * @throws FormatException unwanted.
      */
+    @SuppressWarnings("null")
     @Test
     public void testTristate() throws FormatException {
         Set<VariabilityVariable> set = new HashSet<>();
@@ -181,6 +184,7 @@ public class VmToCnfConverterTest {
      * 
      * @throws FormatException unwanted.
      */
+    @SuppressWarnings("null")
     @Test
     public void testUnnamedVariable() throws FormatException {
         VariabilityModel vm = new VariabilityModel(

@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import net.ssehub.kernel_haven.util.FormatException;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
 import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
@@ -20,12 +21,12 @@ import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 public class CachedSatSolverTest extends AbstractSatSolverTest {
 
     @Override
-    protected SatSolver createSatSolver() {
+    protected @NonNull SatSolver createSatSolver() {
         return new CachedSatSolver();
     }
 
     @Override
-    protected SatSolver createSatSolver(Cnf cnf) {
+    protected @NonNull SatSolver createSatSolver(@NonNull Cnf cnf) {
         return new CachedSatSolver(cnf);
     }
     

@@ -1,5 +1,8 @@
 package net.ssehub.kernel_haven.cnf;
 
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
+
 /**
  * Represents an element of the CNF combining a negation (<b>true if negated</b>
  * ) and the name of the variable.
@@ -20,7 +23,7 @@ public class CnfVariable {
     /**
      * The name of the variables. Not null.
      */
-    private String name;
+    private @NonNull String name;
 
     /**
      * Instanciates a new cnf Variable.
@@ -31,8 +34,7 @@ public class CnfVariable {
      * @param name
      *            represents the variable. Can be null.
      */
-    public CnfVariable(boolean negation, String name) {
-        super();
+    public CnfVariable(boolean negation, @NonNull String name) {
         this.negation = negation;
         this.name = name;
     }
@@ -43,8 +45,7 @@ public class CnfVariable {
      * @param name
      *            is the name of the cnf variable. Must not be null.
      */
-    public CnfVariable(String name) {
-        super();
+    public CnfVariable(@NonNull String name) {
         this.negation = false;
         this.name = name;
     }
@@ -64,7 +65,7 @@ public class CnfVariable {
      *
      * @return the name of the cnf variable. Not null.
      */
-    public String getName() {
+    public @NonNull String getName() {
         return name;
     }
 
@@ -74,7 +75,7 @@ public class CnfVariable {
     }
     
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         boolean result = false;
         if (obj instanceof CnfVariable) {
             CnfVariable other = (CnfVariable) obj;
@@ -84,7 +85,7 @@ public class CnfVariable {
     }
     
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return (negation ? "!" : "") + name;
     }
 

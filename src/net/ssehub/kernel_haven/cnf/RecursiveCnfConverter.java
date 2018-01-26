@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * A CNF converter based on https://www.cs.jhu.edu/~jason/tutorials/convert-to-CNF.html
@@ -21,11 +24,11 @@ import net.ssehub.kernel_haven.util.logic.Variable;
  */
 public class RecursiveCnfConverter implements IFormulaToCnfConverter {
     
-    private static final Variable PSEUDO_TRUE = new Variable("PSEUDO_TRUE");
-    private static final Variable PSEUDO_FALSE = new Variable("PSEUDO_FALSE");
+    private static final @NonNull Variable PSEUDO_TRUE = new Variable("PSEUDO_TRUE");
+    private static final @NonNull Variable PSEUDO_FALSE = new Variable("PSEUDO_FALSE");
     
     @Override
-    public Cnf convert(Formula formula) throws ConverterException {
+    public @NonNull Cnf convert(@NonNull Formula formula) throws ConverterException {
         Cnf result = new Cnf();
         
         if (containsConstants(formula)) {
@@ -46,7 +49,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @param tree The formula to check.
      * @return Whether the formula contains constants.
      */
-    private static boolean containsConstants(Formula tree) {
+    private static boolean containsConstants(@NonNull Formula tree) {
         boolean result = false;
         
         if (tree instanceof True || tree instanceof False) {
@@ -74,7 +77,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @return A copy of the formula with the constants replaced.
      * @throws ConverterException If unexpected elements are found in the tree.
      */
-    private static Formula replaceConstants(Formula tree) throws ConverterException {
+    private static @NonNull Formula replaceConstants(@NonNull Formula tree) throws ConverterException {
         Formula result = null;
         
         
@@ -114,7 +117,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @return The CNF representing the formula.
      * @throws ConverterException If an unexpected element is found in the tree.
      */
-    protected final Cnf convertPrivate(Formula tree) throws ConverterException {
+    protected final @NonNull Cnf convertPrivate(@NonNull Formula tree) throws ConverterException {
         /*
          * See https://www.cs.jhu.edu/~jason/tutorials/convert-to-CNF.html
          */
@@ -145,7 +148,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @return The resulting CNF representing the variable.
      * @throws ConverterException If an unexpected element is found in the tree.
      */
-    protected Cnf handleVariable(Variable var) throws ConverterException {
+    protected @NonNull Cnf handleVariable(@NonNull Variable var) throws ConverterException {
         Cnf result = new Cnf();
         result.addRow(new CnfVariable(false, var.getName()));
         return result;
@@ -158,7 +161,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @return The resulting CNF representing the disjunction.
      * @throws ConverterException If an unexpected element is found in the tree.
      */
-    protected Cnf handleOr(Disjunction call) throws ConverterException {
+    protected @NonNull Cnf handleOr(@NonNull Disjunction call) throws ConverterException {
         /*
          * We have call = P v Q
          * 
@@ -185,7 +188,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
                 row.addAll(p);
                 row.addAll(q);
                 
-                result.addRow(row.toArray(new CnfVariable[0]));
+                result.addRow(notNull(row.toArray(new @NonNull CnfVariable[0])));
             }
         }
         
@@ -199,7 +202,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @return The resulting CNF representing the conjunction.
      * @throws ConverterException If an unexpected element is found in the tree.
      */
-    protected Cnf handleAnd(Conjunction call) throws ConverterException {
+    protected @NonNull Cnf handleAnd(@NonNull Conjunction call) throws ConverterException {
         /*
          * We have call = P ^ Q
          * 
@@ -222,7 +225,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
      * @return The resulting CNF representing the negation.
      * @throws ConverterException If an unexpected element is found in the tree.
      */
-    protected Cnf handleNot(Negation call) throws ConverterException {
+    protected @NonNull Cnf handleNot(@NonNull Negation call) throws ConverterException {
         Cnf result = null;
         
         if (call.getFormula() instanceof Variable) {

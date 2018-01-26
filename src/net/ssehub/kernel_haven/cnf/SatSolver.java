@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +15,9 @@ import org.sat4j.specs.IVec;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
+
 /**
  * SAT solver.
  * 
@@ -22,11 +27,11 @@ import org.sat4j.specs.TimeoutException;
  */
 public class SatSolver {
     
-    private IVec<IVecInt> clauses;
+    private @Nullable IVec<IVecInt> clauses;
     
-    private Map<String, Integer> mapping;
+    private @Nullable Map<String, Integer> mapping;
     
-    private Integer maxMapping;
+    private @Nullable Integer maxMapping;
     
     /**
      * Creates a new and empty Sat solver.
@@ -42,10 +47,10 @@ public class SatSolver {
      * 
      * @param cnf The base CNF.
      */
-    public SatSolver(Cnf cnf) {
-        mapping = getMapping(cnf);
+    public SatSolver(@NonNull Cnf cnf) {
+        Map<String, Integer> mapping = getMapping(cnf);
         
-        maxMapping = 0;
+        Integer maxMapping = 0;
         for (Integer entry : mapping.values()) {
             if (entry > maxMapping) {
                 maxMapping = entry;
@@ -53,6 +58,9 @@ public class SatSolver {
         }
         
         clauses = getClauses(cnf, mapping);
+        
+        this.mapping = mapping;
+        this.maxMapping = maxMapping;
     }
     
     /**
@@ -63,7 +71,7 @@ public class SatSolver {
      * @return true if satisfiable.
      * @throws SolverException If the sat solver fails.
      */
-    public boolean isSatisfiable(Cnf cnf) throws SolverException {
+    public boolean isSatisfiable(@NonNull Cnf cnf) throws SolverException {
         Map<String, Integer> numberVarMapping = getMapping(cnf);
 
         boolean sat = false;
@@ -94,7 +102,7 @@ public class SatSolver {
      * @return The solver that can be used.
      * @throws ContradictionException If the pre-existing CNF already has a contradiction.
      */
-    private ISolver createSolver() throws ContradictionException {
+    private @NonNull ISolver createSolver() throws ContradictionException {
         ISolver solver = SolverFactory.newDefault();
         solver.setDBSimplificationAllowed(false);
         
@@ -112,13 +120,14 @@ public class SatSolver {
      * @param cnf The CNF to create the mapping for.
      * @return The mapping for the given CNF (plus the pre-existing).
      */
-    private Map<String, Integer> getMapping(Cnf cnf) {
+    private @NonNull Map<String, Integer> getMapping(@NonNull Cnf cnf) {
         Map<String, Integer> numberVarMapping = new HashMap<>();
         int i = 1;
         
-        if (this.mapping != null) {
-            numberVarMapping.putAll(this.mapping);
-            i = maxMapping + 1;
+        Map<String, Integer> mapping = this.mapping;
+        if (mapping != null) {
+            numberVarMapping.putAll(mapping);
+            i = notNull(maxMapping) + 1;
         }
         
         for (String varName : cnf.getAllVarNames()) {
@@ -138,7 +147,7 @@ public class SatSolver {
      * @param numberMapping The mapping from name to integer to use.
      * @return The clauses for the solver.
      */
-    private IVec<IVecInt> getClauses(Cnf cnf, Map<String, Integer> numberMapping) {
+    private @NonNull IVec<IVecInt> getClauses(@NonNull Cnf cnf, @NonNull Map<String, Integer> numberMapping) {
 
         VecInt[] result = new VecInt[cnf.getRowCount()];
         

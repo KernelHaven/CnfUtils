@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
+
 /**
  * An exception thrown if the SAT solver fails to solve something.
  * 
@@ -21,7 +23,7 @@ public class SolverException extends Exception {
      * 
      * @param cause The cause that caused this exception.
      */
-    public SolverException(Throwable cause) {
+    public SolverException(@Nullable Throwable cause) {
         super(cause);
     }
     

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
+
 /**
  * The SatSolverTest tests if the sat4j library is correct used. Therefore this
  * class tests whether a CNF is satisfiable
@@ -24,34 +26,34 @@ public abstract class AbstractSatSolverTest {
     /**
      * A Cnf Variable which is not negated.
      */
-    private CnfVariable a = new CnfVariable(false, "A");
+    private @NonNull CnfVariable a = new CnfVariable(false, "A");
 
     /**
      * A Cnf Variable which is not negated.
      */
-    private CnfVariable b = new CnfVariable(false, "B");
+    private @NonNull CnfVariable b = new CnfVariable(false, "B");
     
     /**
      * A Cnf Variable which is not negated.
      */
-    private CnfVariable c = new CnfVariable(false, "C");
+    private @NonNull CnfVariable c = new CnfVariable(false, "C");
 
     /**
      * A Cnf Variable which is negated.
      */
-    private CnfVariable notA = new CnfVariable(true, "A");
+    private @NonNull CnfVariable notA = new CnfVariable(true, "A");
 
     /**
      * A Cnf Variable which is negated.
      */
-    private CnfVariable notB = new CnfVariable(true, "B");
+    private @NonNull CnfVariable notB = new CnfVariable(true, "B");
     
     /**
      * Creates a SAT solver for testing.
      * 
      * @return The SAT solver to test.
      */
-    protected abstract SatSolver createSatSolver();
+    protected abstract @NonNull SatSolver createSatSolver();
     
     /**
      * Creates a SAT solver for testing.
@@ -60,7 +62,7 @@ public abstract class AbstractSatSolverTest {
      * 
      * @return The SAT solver to test.
      */
-    protected abstract SatSolver createSatSolver(Cnf cnf);
+    protected abstract @NonNull SatSolver createSatSolver(@NonNull Cnf cnf);
 
     /**
      * Test satisfiability. <b>not A or B</b>
