@@ -65,7 +65,7 @@ public class VmToCnfConverter {
             }
             
             String[] startline = line.split(ROW_DELIMITER);
-            if (startline.length == CNF_START_LINE_LENGTH) {
+            if (startline.length != CNF_START_LINE_LENGTH) {
                 throw new FormatException("Invalid \"p cnf\" line: " + line);
             }
             
