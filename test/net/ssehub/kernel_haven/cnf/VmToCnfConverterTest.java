@@ -203,4 +203,28 @@ public class VmToCnfConverterTest {
         assertThat(cnf.getRow(0).get(1).getName(), is("VARIABLE_2"));
     }
     
+    /**
+     * Tests whether a malformed "p cnf" line correctly throws an exception.
+     * 
+     * @throws FormatException wanted.
+     */
+    @Test(expected = FormatException.class)
+    public void testMalformedPCNFline() throws FormatException {
+        VariabilityModel vm = new VariabilityModel(
+                new File("testdata/vm_to_cnf_converter/wrong_p_cnf.dimacs"), new HashSet<>());
+        new VmToCnfConverter().convertVmToCnf(vm);
+    }
+    
+    /**
+     * Tests whether a non existing DIMACS file correctly throws an exception.
+     * 
+     * @throws FormatException wanted.
+     */
+    @Test(expected = FormatException.class)
+    public void testNonExistingFile() throws FormatException {
+        VariabilityModel vm = new VariabilityModel(
+                new File("testdata/vm_to_cnf_converter/doesnt_exist.dimacs"), new HashSet<>());
+        new VmToCnfConverter().convertVmToCnf(vm);
+    }
+    
 }

@@ -9,11 +9,11 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  * @author Johannes
  */
 public class FormulaToCnfConverterFactory {
-
+    
     /**
      * The strategies possible to convert formulas to CNF.
      */
-    public enum Strategy {
+    public static enum Strategy {
         
         /**
          * Recursively walk through the formula to convert while transforming it into CNF.
@@ -27,6 +27,12 @@ public class FormulaToCnfConverterFactory {
          * See https://www.cs.jhu.edu/~jason/tutorials/convert-to-CNF.html
          */
         RECURISVE_REPLACING,
+    }
+    
+    /**
+     * Don't allow any instances.
+     */
+    private FormulaToCnfConverterFactory() {
     }
     
     /**

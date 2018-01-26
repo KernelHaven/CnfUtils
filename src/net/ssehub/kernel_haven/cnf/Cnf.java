@@ -113,20 +113,6 @@ public class Cnf {
     }
 
     /**
-     * Gets the element count. This must <b>not</b> be the equal size of the set
-     * of all variable names {@link Cnf#getAllVarNames()}.
-     * 
-     * @return the element count
-     */
-    public int getElementCount() {
-        int count = 0;
-        for (List<CnfVariable> list : table) {
-            count += list.size();
-        }
-        return count;
-    }
-
-    /**
      * Returns all existing VariableNames to generate unique identification
      * numbers.
      * 
@@ -234,7 +220,7 @@ public class Cnf {
     public int hashCode() {
         int hash = 3244324;
         
-        // sum op the hashes of the rows; this has the benefit that the order of the rows doesn't matter for hash
+        // sum up the hashes of the rows; this has the benefit that the order of the rows doesn't matter for hash
         // (since it also doesn't matter for semantics)
         for (List<CnfVariable> row : table) {
             

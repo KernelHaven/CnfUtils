@@ -12,8 +12,10 @@ import org.junit.runners.Suite.SuiteClasses;
     VmToCnfConverterTest.class,
     SatSolverTest.class,
     CnfTest.class,
-    CnfConverterTest.class,
+    RecursiveCnfConverterTest.class,
+    RecursiveReplacingCnfConverterTest.class,
     CachedSatSolverTest.class,
+    FormulaToCnfConverterFactoryTest.class,
     })
 public class AllCNFTests {
 

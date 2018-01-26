@@ -7,27 +7,25 @@ import org.junit.Test;
 
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
+import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
-/**
- * Test class for the CnfConverters.
- * 
- * @author Adam
- * @author Johannes
- */
-public class CnfConverterTest {
+public abstract class AbstractCnfConverterTest {
     
+    protected abstract @NonNull IFormulaToCnfConverter createConverter();
+
     /**
-     * Tests whether the given CNF converter converts correctly to CNF.
+     * Tests whether a formula is translated correctly.
      * 
-     * @param converter The converter to test.
      * @throws SolverException unwanted.
      * @throws ConverterException unwanted.
      */
-    public void testConverter1(IFormulaToCnfConverter converter) throws SolverException, ConverterException {
+    @Test
+    public void testConverter1() throws SolverException, ConverterException {
         Variable a = new Variable("A");
         Variable b = new Variable("B");
         
@@ -39,6 +37,7 @@ public class CnfConverterTest {
         // 1 | 1 | 0
         Formula bool = new Conjunction(new Disjunction(a, new Negation(b)), new Negation(a));
         
+        IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
         
         Cnf notAnotB = new Cnf();
@@ -66,13 +65,13 @@ public class CnfConverterTest {
     }
     
     /**
-     * Tests whether the given CNF converter converts correctly to CNF.
+     * Tests whether a formula is translated correctly.
      * 
-     * @param converter The converter to test.
      * @throws SolverException unwanted.
      * @throws ConverterException unwanted.
      */
-    public void testConverter2(IFormulaToCnfConverter converter) throws SolverException, ConverterException {
+    @Test
+    public void testConverter2() throws SolverException, ConverterException {
         Variable a = new Variable("A");
         Variable b = new Variable("B");
         
@@ -84,6 +83,7 @@ public class CnfConverterTest {
         // 1 | 1 | 0
         Formula bool = new Disjunction(new Conjunction(a, new Negation(b)), new Conjunction(new Negation(a), b));
         
+        IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
         
         Cnf notAnotB = new Cnf();
@@ -111,24 +111,26 @@ public class CnfConverterTest {
     }
     
     /**
-     * Tests whether the given CNF converter converts correctly to CNF containing constants.
+     * Tests whether constants are converted correctly
      * 
-     * @param converter The converter to test.
      * @throws SolverException unwanted.
      * @throws ConverterException unwanted.
      */
-    public void testConverterConstants(IFormulaToCnfConverter converter) throws SolverException, ConverterException {
+    @Test
+    public void testConverterConstants() throws SolverException, ConverterException {
         Variable a = new Variable("A");
         Variable b = new Variable("B");
         
-        // a | b | (a && !b) || !true
+        // a | b | ((a && !b) || false) || !true
         //---+---+-----------------
         // 0 | 0 | 0
         // 0 | 1 | 0
         // 1 | 0 | 1
         // 1 | 1 | 0
-        Formula bool = new Disjunction(new Conjunction(a, new Negation(b)), new Negation(True.INSTANCE));
+        Formula bool = new Disjunction(new Disjunction(new Conjunction(a, new Negation(b)), False.INSTANCE),
+                new Negation(True.INSTANCE));
         
+        IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
         
         Cnf notAnotB = new Cnf();
@@ -156,69 +158,126 @@ public class CnfConverterTest {
     }
     
     /**
-     * Tests the RecursiveCnfConverter with the testConverter() method.
+     * Tests whether double negations are converted correctly.
      * 
      * @throws SolverException unwanted.
      * @throws ConverterException unwanted.
      */
     @Test
-    public void testRecursiveCnfConverter1() throws SolverException, ConverterException {
-        testConverter1(new RecursiveCnfConverter());
-    }
-
-    /**
-     * Tests the RecursiveCnfConverter with the testConverter() method.
-     * 
-     * @throws SolverException unwanted.
-     * @throws ConverterException unwanted.
-     */
-    @Test
-    public void testRecursiveCnfConverter2() throws SolverException, ConverterException {
-        testConverter2(new RecursiveCnfConverter());
-    }
-    
-    /**
-     * Tests the RecursiveCnfConverter with the testConverter() method.
-     * 
-     * @throws SolverException unwanted.
-     * @throws ConverterException unwanted.
-     */
-    @Test
-    public void testRecursiveCnfConverterConstants() throws SolverException, ConverterException {
-        testConverterConstants(new RecursiveCnfConverter());
-    }
-    
-    
-    /**
-     * Tests the RecursiveReplacingCnfConverter with the testConverter() method.
-     * 
-     * @throws SolverException unwanted.
-     * @throws ConverterException unwanted.
-     */
-    @Test
-    public void testRecursiveReplacingCnfConverter1() throws SolverException, ConverterException {
-        testConverter1(new RecursiveReplacingCnfConverter());
-    }
-
-    /**
-     * Tests the RecursiveReplacingCnfConverter with the testConverter() method.
-     * 
-     * @throws SolverException unwanted.
-     * @throws ConverterException unwanted.
-     */
-    @Test
-    public void testRecursiveReplacingCnfConverter2() throws SolverException, ConverterException {
-        testConverter2(new RecursiveReplacingCnfConverter());
+    public void testConverterDoubleNegation() throws SolverException, ConverterException {
+        Variable a = new Variable("A");
+        
+        // a | !!a
+        //---+-----
+        // 0 | 0
+        // 0 | 1
+        Formula bool = new Negation(new Negation(a));
+        
+        IFormulaToCnfConverter converter = createConverter();
+        Cnf cnf = converter.convert(bool);
+        
+        Cnf aCnf = new Cnf();
+        aCnf.addRow(new CnfVariable(false, "A"));
+        
+        Cnf notACnf = new Cnf();
+        notACnf.addRow(new CnfVariable(true, "A"));
+        
+        SatSolver solver = new SatSolver();
+        
+        assertThat(solver.isSatisfiable(cnf.combine(aCnf)), is(true));
+        assertThat(solver.isSatisfiable(cnf.combine(notACnf)), is(false));
     }
     
     /**
-     * Tests the RecursiveReplacingCnfConverter with the testConverter() method.
+     * Tests whether a negated or is translated correctly.
      * 
      * @throws SolverException unwanted.
      * @throws ConverterException unwanted.
      */
     @Test
-    public void testRecursiveReplacingCnfConverterConstants() throws SolverException, ConverterException {
-        testConverterConstants(new RecursiveReplacingCnfConverter());
+    public void testNegatedOr() throws SolverException, ConverterException {
+        Variable a = new Variable("A");
+        Variable b = new Variable("B");
+        
+        // a | b | !(a || b)
+        //---+---+-----------------
+        // 0 | 0 | 1
+        // 0 | 1 | 0
+        // 1 | 0 | 0
+        // 1 | 1 | 0
+        Formula bool = new Negation(new Disjunction(a, b));
+        
+        IFormulaToCnfConverter converter = createConverter();
+        Cnf cnf = converter.convert(bool);
+        
+        Cnf notAnotB = new Cnf();
+        notAnotB.addRow(new CnfVariable(true, "A"));
+        notAnotB.addRow(new CnfVariable(true, "B"));
+        
+        Cnf notAB = new Cnf();
+        notAB.addRow(new CnfVariable(true, "A"));
+        notAB.addRow(new CnfVariable(false, "B"));
+        
+        Cnf anotB = new Cnf();
+        anotB.addRow(new CnfVariable(false, "A"));
+        anotB.addRow(new CnfVariable(true, "B"));
+        
+        Cnf aB = new Cnf();
+        aB.addRow(new CnfVariable(false, "A"));
+        aB.addRow(new CnfVariable(false, "B"));
+        
+        SatSolver solver = new SatSolver();
+        
+        assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(true));
+        assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(false));
+        assertThat(solver.isSatisfiable(cnf.combine(anotB)), is(false));
+        assertThat(solver.isSatisfiable(cnf.combine(aB)), is(false));
     }
+    
+    /**
+     * Tests whether a negated or is translated correctly.
+     * 
+     * @throws SolverException unwanted.
+     * @throws ConverterException unwanted.
+     */
+    @Test
+    public void testNegatedAnd() throws SolverException, ConverterException {
+        Variable a = new Variable("A");
+        Variable b = new Variable("B");
+        
+        // a | b | !(a || b)
+        //---+---+-----------------
+        // 0 | 0 | 1
+        // 0 | 1 | 1
+        // 1 | 0 | 1
+        // 1 | 1 | 0
+        Formula bool = new Negation(new Conjunction(a, b));
+        
+        IFormulaToCnfConverter converter = createConverter();
+        Cnf cnf = converter.convert(bool);
+        
+        Cnf notAnotB = new Cnf();
+        notAnotB.addRow(new CnfVariable(true, "A"));
+        notAnotB.addRow(new CnfVariable(true, "B"));
+        
+        Cnf notAB = new Cnf();
+        notAB.addRow(new CnfVariable(true, "A"));
+        notAB.addRow(new CnfVariable(false, "B"));
+        
+        Cnf anotB = new Cnf();
+        anotB.addRow(new CnfVariable(false, "A"));
+        anotB.addRow(new CnfVariable(true, "B"));
+        
+        Cnf aB = new Cnf();
+        aB.addRow(new CnfVariable(false, "A"));
+        aB.addRow(new CnfVariable(false, "B"));
+        
+        SatSolver solver = new SatSolver();
+        
+        assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(true));
+        assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(true));
+        assertThat(solver.isSatisfiable(cnf.combine(anotB)), is(true));
+        assertThat(solver.isSatisfiable(cnf.combine(aB)), is(false));
+    }
+    
 }
