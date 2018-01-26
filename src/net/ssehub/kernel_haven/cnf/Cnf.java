@@ -60,7 +60,8 @@ public class Cnf {
      * @param row
      *            is the row with the CnfVariables to be added.
      */
-    public void addRow(@NonNull CnfVariable @NonNull ... row) {
+    public void addRow(@NonNull CnfVariable /*@NonNull*/ ... row) {
+        // TODO: commented out @NonNull annotation because checkstyle can't parse it
         this.table.add(notNull(Arrays.asList(row)));
     }
 
