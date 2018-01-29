@@ -14,8 +14,17 @@ import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
+/**
+ * Test suite to test instances of the {@link IFormulaToCnfConverter}.
+ * @author Adam
+ *
+ */
 public abstract class AbstractCnfConverterTest {
     
+    /**
+     * Creates the instance of the {@link IFormulaToCnfConverter} to test by the sub test suite.
+     * @return The instance of the {@link IFormulaToCnfConverter} to test
+     */
     protected abstract @NonNull IFormulaToCnfConverter createConverter();
 
     /**
@@ -111,7 +120,7 @@ public abstract class AbstractCnfConverterTest {
     }
     
     /**
-     * Tests whether constants are converted correctly
+     * Tests whether constants are converted correctly.
      * 
      * @throws SolverException unwanted.
      * @throws ConverterException unwanted.
