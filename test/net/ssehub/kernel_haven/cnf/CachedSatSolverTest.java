@@ -39,7 +39,7 @@ public class CachedSatSolverTest extends AbstractSatSolverTest {
     @Test
     public void testCacheSpeed() throws FormatException, SolverException {
         Cnf huge = new VmToCnfConverter().convertVmToCnf(new VariabilityModel(new File("testdata/huge.dimacs"),
-                new HashMap<String, VariabilityVariable>()));
+                new HashMap<@NonNull String, VariabilityVariable>()));
         
         SatSolver normalSolver = new SatSolver(huge);
         CachedSatSolver solver = new CachedSatSolver(huge);
