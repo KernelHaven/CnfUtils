@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -79,4 +81,26 @@ public class LogicUtilsTest {
         
         Assert.assertSame(varA, simplified);
     }
+    
+    /**
+     * Tests that the simplification for the formula A || (some complicated middle part) || (A && B) correctly drops
+     * the last part.
+     */
+    @Test
+    public void testComplicatedMiddlePart() {
+        Variable varA = new Variable("A");
+        Variable varB = new Variable("B");
+        Variable varC = new Variable("C");
+        Variable varD = new Variable("D");
+        Variable varE = new Variable("E");
+        
+        Formula middlePart = new Conjunction(varC, new Disjunction(varD, varE));
+        Formula rightPart = new Conjunction(varA, varB);
+        
+        Formula complicated = new Disjunction(varA, new Disjunction(middlePart, rightPart));
+        Formula simplified = LogicUtils.simplify(complicated);
+        
+        assertEquals(new Disjunction(varA, middlePart), simplified);
+    }
+    
 }
