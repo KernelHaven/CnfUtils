@@ -15,6 +15,7 @@ import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
 import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
+import net.ssehub.kernel_haven.variability_model.VariabilityModelDescriptor.ConstraintFileType;
 
 /**
  * This class tests if the VM is correctly convertet to Cnf.
@@ -45,6 +46,7 @@ public class VmToCnfConverterTest {
         
         // Converting
         VariabilityModel vm = new VariabilityModel(new File("testdata/vm_to_cnf_converter/testmodel.dimacs"), set);
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         Cnf cnf = new VmToCnfConverter().convertVmToCnf(vm);
         
         // Detect if used
@@ -92,6 +94,7 @@ public class VmToCnfConverterTest {
     public void testNonDimacs() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/wrong_format.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
@@ -104,6 +107,7 @@ public class VmToCnfConverterTest {
     public void testWrongNumber() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/wrong_number.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
@@ -116,6 +120,7 @@ public class VmToCnfConverterTest {
     public void testTooHighNumber() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/too_high.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
@@ -129,6 +134,7 @@ public class VmToCnfConverterTest {
     public void testWrongNumberOfLinesTooFew() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/wrong_lines_1.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
@@ -142,6 +148,7 @@ public class VmToCnfConverterTest {
     public void testWrongNumberOfLinesTooMuch() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/wrong_lines_2.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
@@ -166,6 +173,7 @@ public class VmToCnfConverterTest {
         
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/tristate.dimacs"), set);
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         Cnf cnf = new VmToCnfConverter().convertVmToCnf(vm);
         
         assertThat(cnf.getRowCount(), is(1));
@@ -189,6 +197,7 @@ public class VmToCnfConverterTest {
     public void testUnnamedVariable() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/tristate.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         
         Cnf cnf = new VmToCnfConverter().convertVmToCnf(vm);
         
@@ -212,6 +221,7 @@ public class VmToCnfConverterTest {
     public void testMalformedPCNFline() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/wrong_p_cnf.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
@@ -224,6 +234,7 @@ public class VmToCnfConverterTest {
     public void testNonExistingFile() throws FormatException {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/doesnt_exist.dimacs"), new HashSet<>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     

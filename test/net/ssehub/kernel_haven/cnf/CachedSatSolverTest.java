@@ -12,6 +12,7 @@ import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
 import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
+import net.ssehub.kernel_haven.variability_model.VariabilityModelDescriptor.ConstraintFileType;
 
 /**
  * Tests the {@link CachedSatSolver}.
@@ -38,8 +39,10 @@ public class CachedSatSolverTest extends AbstractSatSolverTest {
      */
     @Test
     public void testCacheSpeed() throws FormatException, SolverException {
-        Cnf huge = new VmToCnfConverter().convertVmToCnf(new VariabilityModel(new File("testdata/huge.dimacs"),
-                new HashMap<@NonNull String, VariabilityVariable>()));
+        VariabilityModel vm = new VariabilityModel(new File("testdata/huge.dimacs"),
+                new HashMap<@NonNull String, VariabilityVariable>());
+        vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
+        Cnf huge = new VmToCnfConverter().convertVmToCnf(vm);
         
         SatSolver normalSolver = new SatSolver(huge);
         CachedSatSolver solver = new CachedSatSolver(huge);
@@ -69,9 +72,6 @@ public class CachedSatSolverTest extends AbstractSatSolverTest {
                 assertThat(tnormal > tcache, is(true));
             }
         }
-        
-        
-
     }
 
 }

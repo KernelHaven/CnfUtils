@@ -15,6 +15,7 @@ import java.util.Set;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
+import net.ssehub.kernel_haven.variability_model.VariabilityModelDescriptor.ConstraintFileType;
 import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
 /**
@@ -48,6 +49,10 @@ public class VmToCnfConverter {
      * @throws FormatException If the constraint model file of the {@link VariabilityModel} is not a DIMACS file.
      */
     public @NonNull Cnf convertVmToCnf(@NonNull VariabilityModel vm) throws FormatException {
+        if (vm.getDescriptor().getConstraintFileType() != ConstraintFileType.DIMACS) {
+            throw new FormatException("Descriptor says constraint file type is not DIMACS");
+        }
+        
         File dimacsModel = vm.getConstraintModel();
         Cnf cnf = null;
         Map<Integer, String> vmMap = getMapOfVM(vm);
