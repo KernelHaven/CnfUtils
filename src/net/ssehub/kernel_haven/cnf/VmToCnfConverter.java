@@ -5,9 +5,9 @@ import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNullArrayW
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,22 +56,22 @@ public class VmToCnfConverter {
         File dimacsModel = vm.getConstraintModel();
         Cnf cnf = null;
         Map<Integer, String> vmMap = getMapOfVM(vm);
-        BufferedReader br = null;
+        LineNumberReader br = null;
         try {
-            br = new BufferedReader(new FileReader(dimacsModel));
+            br = new LineNumberReader(new BufferedReader(new FileReader(dimacsModel)));
             String line = br.readLine();
             // iterating over variability variables.
-            while (!line.contains(CNF_START_INDICATOR)) {
+            while (line != null && !line.contains(CNF_START_INDICATOR)) {
                 line = br.readLine();
-                if (line == null) {
-                    // we are at the end of file without finding the proper start indicator
-                    throw new FormatException("Missing \"p cnf\" line");
-                }
+            }
+            if (line == null) {
+                // we are at the end of file without finding the proper start indicator
+                throw new FormatException("Missing \"p cnf\" line");
             }
             
             String[] startline = line.split(ROW_DELIMITER);
             if (startline.length != CNF_START_LINE_LENGTH) {
-                throw new FormatException("Invalid \"p cnf\" line: " + line);
+                throw new FormatException("Invalid \"p cnf\" line in linenumber " + br.getLineNumber() + ": " + line);
             }
             
             // p cnf 2 4
@@ -85,21 +85,23 @@ public class VmToCnfConverter {
             while (line != null) {
                 count++;
                 if (count > initialLenght) {
-                    throw new FormatException("Too many lines found");
+                    throw new FormatException("Too many lines found (current line " + br.getLineNumber() + ")");
                 }
                 
-                cnf.addRow(parseLine(line, vmMap, maxNumber));
+                cnf.addRow(parseLine(line, vmMap, maxNumber, br.getLineNumber()));
                 
                 line = br.readLine();
             }
             
             if (count < initialLenght) {
-                throw new FormatException("Too few lines found");
+                throw new FormatException("Reached end of file with too few lines found");
             }
         } catch (NumberFormatException e) {
-            throw new FormatException("Error parsing number: " + e.getMessage());
-        } catch (FileNotFoundException e) {
-            throw new FormatException(e);
+            if (br != null) {
+                throw new FormatException("Error parsing number in line " + br.getLineNumber() + ": " + e.getMessage());
+            } else {
+                throw new FormatException("Error parsing number: " + e.getMessage());
+            }
         } catch (IOException e) {
             throw new FormatException(e);
         } finally {
@@ -120,11 +122,12 @@ public class VmToCnfConverter {
      * @param vmMap The mapping of number -> variable name.
      * @param line The line to parse.
      * @param maxNumber The maximum allowed variable number.
+     * @param currentLineNumber The current line number in the DIMACS file (for error messages).
      * @return The CNF line.
      * @throws FormatException If the format is wrong.
      */
     private @NonNull CnfVariable @NonNull [] parseLine(@NonNull String line, @NonNull Map<Integer, String> vmMap,
-            int maxNumber) throws FormatException {
+            int maxNumber, int currentLineNumber) throws FormatException {
         
         String[] dimacsModelLine = line.split(ROW_DELIMITER);
         CnfVariable[] cnfRow = new CnfVariable[dimacsModelLine.length - 1];
@@ -134,7 +137,7 @@ public class VmToCnfConverter {
             boolean isNot = dimacsNumber < 0;
             
             if (absolutDimacsNumber > maxNumber) {
-                throw new FormatException("Too high number: " + absolutDimacsNumber);
+                throw new FormatException("Too high number in line " + currentLineNumber + ": " + absolutDimacsNumber);
             }
             
             if (!vmMap.containsKey(absolutDimacsNumber)) {

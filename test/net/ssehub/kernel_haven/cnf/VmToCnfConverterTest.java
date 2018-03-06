@@ -14,8 +14,9 @@ import org.junit.Test;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.variability_model.VariabilityModel;
-import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
+import net.ssehub.kernel_haven.variability_model.VariabilityModelDescriptor;
 import net.ssehub.kernel_haven.variability_model.VariabilityModelDescriptor.ConstraintFileType;
+import net.ssehub.kernel_haven.variability_model.VariabilityVariable;
 
 /**
  * This class tests if the VM is correctly convertet to Cnf.
@@ -235,6 +236,18 @@ public class VmToCnfConverterTest {
         VariabilityModel vm = new VariabilityModel(
                 new File("testdata/vm_to_cnf_converter/doesnt_exist.dimacs"), new HashSet<>());
         vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
+        new VmToCnfConverter().convertVmToCnf(vm);
+    }
+    
+    /**
+     * Tests whether a wrong {@link VariabilityModelDescriptor} correctly throws an exception.
+     * 
+     * @throws FormatException wanted.
+     */
+    @Test(expected = FormatException.class)
+    public void testWrongDescripor() throws FormatException {
+        VariabilityModel vm = new VariabilityModel(
+                new File("testdata/vm_to_cnf_converter/testmodel.dimacs"), new HashSet<>());
         new VmToCnfConverter().convertVmToCnf(vm);
     }
     
