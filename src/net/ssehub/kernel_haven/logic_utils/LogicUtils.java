@@ -8,6 +8,7 @@ import com.bpodgursky.jbool_expressions.rules.RuleSet;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.logic.FormulaSimplifier;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
@@ -56,6 +57,13 @@ public class LogicUtils {
             }
         }
         return result;
+    }
+    
+    /**
+     * Initialization method called by KernelHaven. See loadClasses.txt
+     */
+    public static void initialize() {
+        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
     }
     
 }
