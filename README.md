@@ -1,11 +1,19 @@
 # CnfUtils
 
-CNF utility functions for analysis plug-ins, based on [Sat4j v2.3.4](http://www.sat4j.org/).
+![Build Status](http://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=KernelHaven_CnfUtils)
+
+A utility plugin for [KernelHaven](https://github.com/KernelHaven/KernelHaven).
+
+Utilities for Boolean formulas, including CNF converters and a SAT solver (based on [Sat4j v2.3.4](http://www.sat4j.org/)).
 
 ## Usage
 
-To make these utilities available to analysis classes, place `cnfutils.jar` and [`sat4j.jar`](https://github.com/KernelHaven/CnfUtils/blob/master/lib/sat4j-sat-2.3.4.jar) into the plugins folder of KernelHaven.
+Place [`CnfUtils.jar`](https://jenkins.sse.uni-hildesheim.de/view/KernelHaven/job/KernelHaven_CnfUtils/lastSuccessfulBuild/artifact/build/jar/CnfUtils.jar) in the plugins folder of KernelHaven.
+
+## Dependencies
+
+This plugin has no additional dependencies other than KernelHaven.
 
 ## License
 
-These utilities are licensed under [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0.html).
+This plugin is licensed under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).
