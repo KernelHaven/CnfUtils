@@ -1,5 +1,8 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import java.util.ArrayList;
@@ -248,11 +251,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
             Formula p = innerCall.getLeft();
             Formula q = innerCall.getRight();
               
-            Formula notP = new Negation(p);
-            Formula notQ = new Negation(q);
-            Formula newAnd = new Conjunction(notP, notQ);
-            
-            result = convertPrivate(newAnd);
+            result = convertPrivate(and(not(p), not(q)));
             
         } else if (call.getFormula() instanceof Conjunction) {
             // If call has the form ~(P ^ Q), then return CONVERT(~P v ~Q). (de Morgan's Law)
@@ -261,11 +260,7 @@ public class RecursiveCnfConverter implements IFormulaToCnfConverter {
             Formula p = innerCall.getLeft();
             Formula q = innerCall.getRight();
               
-            Formula notP = new Negation(p);
-            Formula notQ = new Negation(q);
-            Formula newOr = new Disjunction(notP, notQ);
-
-            result = convertPrivate(newOr);
+            result = convertPrivate(or(not(p), not(q)));
         
         } else {
             throw new ConverterException("Invalid element in not call: " + call.getFormula().getClass());

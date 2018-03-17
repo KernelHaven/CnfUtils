@@ -1,14 +1,14 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import net.ssehub.kernel_haven.util.logic.Conjunction;
-import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.Formula;
-import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.Variable;
 
 /**
@@ -25,12 +25,10 @@ public class LogicUtilsTest {
      */
     @Test
     public void testNoSimplificationAND() {
-        Variable varA = new Variable("A");
-        Variable varB = new Variable("B");
-        Formula complicated = new Conjunction(varA, varB);
+        Formula complicated = and("A", "B");
         Formula simplified = LogicUtils.simplify(complicated);
         
-        Assert.assertSame(complicated, simplified);
+        Assert.assertEquals(complicated, simplified);
     }
     
     /**
@@ -38,12 +36,10 @@ public class LogicUtilsTest {
      */
     @Test
     public void testNoSimplificationOR() {
-        Variable varA = new Variable("A");
-        Variable varB = new Variable("B");
-        Formula complicated = new Disjunction(varA, varB);
+        Formula complicated = or("A", "B");
         Formula simplified = LogicUtils.simplify(complicated);
         
-        Assert.assertSame(complicated, simplified);
+        Assert.assertEquals(complicated, simplified);
     }
     
     /**
@@ -52,10 +48,10 @@ public class LogicUtilsTest {
     @Test
     public void testORSimplification() {
         Variable varA = new Variable("A");
-        Formula complicated = new Disjunction(varA, varA);
+        Formula complicated = or("A", "A");
         Formula simplified = LogicUtils.simplify(complicated);
         
-        Assert.assertSame(varA, simplified);
+        Assert.assertEquals(varA, simplified);
     }
     
     /**
@@ -64,10 +60,10 @@ public class LogicUtilsTest {
     @Test
     public void testANDSimplification() {
         Variable varA = new Variable("A");
-        Formula complicated = new Conjunction(varA, varA);
+        Formula complicated = and("A", "A");
         Formula simplified = LogicUtils.simplify(complicated);
         
-        Assert.assertSame(varA, simplified);
+        Assert.assertEquals(varA, simplified);
     }
     
     /**
@@ -76,10 +72,10 @@ public class LogicUtilsTest {
     @Test
     public void testDoubleNotSimplification() {
         Variable varA = new Variable("A");
-        Formula complicated = new Negation(new Negation(varA));
+        Formula complicated = not(not("A"));
         Formula simplified = LogicUtils.simplify(complicated);
         
-        Assert.assertSame(varA, simplified);
+        Assert.assertEquals(varA, simplified);
     }
     
     /**
@@ -88,19 +84,12 @@ public class LogicUtilsTest {
      */
     @Test
     public void testComplicatedMiddlePart() {
-        Variable varA = new Variable("A");
-        Variable varB = new Variable("B");
-        Variable varC = new Variable("C");
-        Variable varD = new Variable("D");
-        Variable varE = new Variable("E");
+        Formula middlePart = and("C", or("D", "E"));
         
-        Formula middlePart = new Conjunction(varC, new Disjunction(varD, varE));
-        Formula rightPart = new Conjunction(varA, varB);
-        
-        Formula complicated = new Disjunction(varA, new Disjunction(middlePart, rightPart));
+        Formula complicated = or("A", or(middlePart, and("A", "B")));
         Formula simplified = LogicUtils.simplify(complicated);
         
-        assertEquals(new Disjunction(varA, middlePart), simplified);
+        assertEquals(or("A", middlePart), simplified);
     }
     
 }

@@ -1,17 +1,16 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import net.ssehub.kernel_haven.util.logic.Conjunction;
-import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
-import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
-import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
@@ -35,16 +34,13 @@ public abstract class AbstractCnfConverterTest {
      */
     @Test
     public void testConverter1() throws SolverException, ConverterException {
-        Variable a = new Variable("A");
-        Variable b = new Variable("B");
-        
         // a | b | (a || !b) && !a
         //---+---+-----------------
         // 0 | 0 | 1
         // 0 | 1 | 0
         // 1 | 0 | 0
         // 1 | 1 | 0
-        Formula bool = new Conjunction(new Disjunction(a, new Negation(b)), new Negation(a));
+        Formula bool = and(or("A", not("B")), not("A"));
         
         IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
@@ -81,16 +77,13 @@ public abstract class AbstractCnfConverterTest {
      */
     @Test
     public void testConverter2() throws SolverException, ConverterException {
-        Variable a = new Variable("A");
-        Variable b = new Variable("B");
-        
         // a | b | (a && !b) || (!a && b)
         //---+---+-----------------
         // 0 | 0 | 0
         // 0 | 1 | 1
         // 1 | 0 | 1
         // 1 | 1 | 0
-        Formula bool = new Disjunction(new Conjunction(a, new Negation(b)), new Conjunction(new Negation(a), b));
+        Formula bool = or(and("A", not("B")), and(not("A"), "B"));
         
         IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
@@ -127,17 +120,13 @@ public abstract class AbstractCnfConverterTest {
      */
     @Test
     public void testConverterConstants() throws SolverException, ConverterException {
-        Variable a = new Variable("A");
-        Variable b = new Variable("B");
-        
         // a | b | ((a && !b) || false) || !true
         //---+---+-----------------
         // 0 | 0 | 0
         // 0 | 1 | 0
         // 1 | 0 | 1
         // 1 | 1 | 0
-        Formula bool = new Disjunction(new Disjunction(new Conjunction(a, new Negation(b)), False.INSTANCE),
-                new Negation(True.INSTANCE));
+        Formula bool = or(or(and("A", not("B")), False.INSTANCE), not(True.INSTANCE));
         
         IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
@@ -174,13 +163,11 @@ public abstract class AbstractCnfConverterTest {
      */
     @Test
     public void testConverterDoubleNegation() throws SolverException, ConverterException {
-        Variable a = new Variable("A");
-        
         // a | !!a
         //---+-----
         // 0 | 0
         // 0 | 1
-        Formula bool = new Negation(new Negation(a));
+        Formula bool = not(not("A"));
         
         IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
@@ -205,16 +192,13 @@ public abstract class AbstractCnfConverterTest {
      */
     @Test
     public void testNegatedOr() throws SolverException, ConverterException {
-        Variable a = new Variable("A");
-        Variable b = new Variable("B");
-        
         // a | b | !(a || b)
         //---+---+-----------------
         // 0 | 0 | 1
         // 0 | 1 | 0
         // 1 | 0 | 0
         // 1 | 1 | 0
-        Formula bool = new Negation(new Disjunction(a, b));
+        Formula bool = not(or("A", "B"));
         
         IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);
@@ -251,16 +235,13 @@ public abstract class AbstractCnfConverterTest {
      */
     @Test
     public void testNegatedAnd() throws SolverException, ConverterException {
-        Variable a = new Variable("A");
-        Variable b = new Variable("B");
-        
         // a | b | !(a || b)
         //---+---+-----------------
         // 0 | 0 | 1
         // 0 | 1 | 1
         // 1 | 0 | 1
         // 1 | 1 | 0
-        Formula bool = new Negation(new Conjunction(a, b));
+        Formula bool = not(and("A", "B"));
         
         IFormulaToCnfConverter converter = createConverter();
         Cnf cnf = converter.convert(bool);

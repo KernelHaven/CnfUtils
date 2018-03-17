@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.Formula;
@@ -39,9 +41,7 @@ public class RecursiveReplacingCnfConverter extends RecursiveCnfConverter {
         if (isComplex(call.getLeft()) && isComplex(call.getRight())) {
             Variable z = new Variable("temp_" + (uniqueCounter++));
             
-            Formula notZ = new Negation(z);
-            
-            Formula left = new Disjunction(notZ, call.getLeft());
+            Formula left = new Disjunction(not(z), call.getLeft());
             Formula right = new Disjunction(z, call.getRight());
             
             result = convertPrivate(new Conjunction(left, right));

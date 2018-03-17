@@ -1,17 +1,16 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import net.ssehub.kernel_haven.util.logic.Conjunction;
-import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.Formula;
-import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
-import net.ssehub.kernel_haven.util.logic.Variable;
 
 /**
  * Tests the CNF.
@@ -55,7 +54,7 @@ public class CnfTest {
         
         Formula formula = cnf.asFormula();
         
-        assertThat(formula, is(new Disjunction(new Variable("A"), new Negation(new Variable("B")))));
+        assertThat(formula, is(or("A", not("B"))));
     }
     
     /**
@@ -69,11 +68,7 @@ public class CnfTest {
         
         Formula formula = cnf.asFormula();
         
-        Variable a = new Variable("A");
-        Formula notB = new Negation(new Variable("B"));
-        Variable c = new Variable("C");
-        
-        assertThat(formula, is(new Conjunction(a, new Disjunction(notB, c))));
+        assertThat(formula, is(and("A", or(not("B"), "C"))));
     }
     
     /**

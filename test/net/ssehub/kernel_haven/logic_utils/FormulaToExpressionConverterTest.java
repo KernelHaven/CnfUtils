@@ -1,5 +1,8 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedList;
@@ -16,11 +19,8 @@ import com.bpodgursky.jbool_expressions.Or;
 import com.bpodgursky.jbool_expressions.Variable;
 
 import net.ssehub.kernel_haven.util.FormatException;
-import net.ssehub.kernel_haven.util.logic.Conjunction;
-import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
-import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
@@ -163,8 +163,7 @@ public class FormulaToExpressionConverterTest {
     @SuppressWarnings("null")
     @Test
     public void testLib2KHNegation() {
-        Assert.assertEquals(new Negation(new net.ssehub.kernel_haven.util.logic.Variable("A")), 
-                translateFormulaLib2KH(Not.of(Variable.of("A"))));
+        Assert.assertEquals(not("A"), translateFormulaLib2KH(Not.of(Variable.of("A"))));
     }
     
     /**
@@ -197,10 +196,7 @@ public class FormulaToExpressionConverterTest {
      */
     @Test
     public void testKH2LibAnd() {
-        Formula f = new Conjunction(new net.ssehub.kernel_haven.util.logic.Variable("A"), 
-                new net.ssehub.kernel_haven.util.logic.Variable("B"));
-        
-        assertEquals("(A & B)", new FormulaToExpressionConverter().visit(f).toString());
+        assertEquals("(A & B)", new FormulaToExpressionConverter().visit(and("A", "B")).toString());
     }
     
     /**
@@ -208,10 +204,7 @@ public class FormulaToExpressionConverterTest {
      */
     @Test
     public void testKH2LibOr() {
-        Formula f = new Disjunction(new net.ssehub.kernel_haven.util.logic.Variable("A"), 
-                new net.ssehub.kernel_haven.util.logic.Variable("B"));
-        
-        assertEquals("(A | B)", new FormulaToExpressionConverter().visit(f).toString());
+        assertEquals("(A | B)", new FormulaToExpressionConverter().visit(or("A", "B")).toString());
     }
     
     /**
@@ -219,9 +212,7 @@ public class FormulaToExpressionConverterTest {
      */
     @Test
     public void testKH2LibNegation() {
-        Formula f = new Negation(new net.ssehub.kernel_haven.util.logic.Variable("A"));
-        
-        assertEquals("!A", new FormulaToExpressionConverter().visit(f).toString());
+        assertEquals("!A", new FormulaToExpressionConverter().visit(not("A")).toString());
     }
     
     /**
