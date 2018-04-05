@@ -6,6 +6,7 @@ import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import net.ssehub.kernel_haven.cnf.ConverterException;
 import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory;
+import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory.Strategy;
 import net.ssehub.kernel_haven.cnf.IFormulaToCnfConverter;
 import net.ssehub.kernel_haven.cnf.SatSolver;
 import net.ssehub.kernel_haven.cnf.SolverException;
@@ -41,7 +42,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             
             
             SatSolver solver = new SatSolver();
-            IFormulaToCnfConverter converter = FormulaToCnfConverterFactory.create();
+            IFormulaToCnfConverter converter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
             
             // all previously considered formulas ORd together (used in sat calls). 
             Formula previous = notNull(queue.poll());
