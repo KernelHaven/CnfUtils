@@ -78,7 +78,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
                     
                     previous = new Disjunction(previous, current);
                     
-                } catch (ConverterException | SolverException e) {
+                } catch (ConverterException | SolverException | StackOverflowError e) {
                     if (null != varName) {
                         LOGGER.logExceptionWarning("Error while creating disjunction for conditions of " + varName, e);
                     } else {
