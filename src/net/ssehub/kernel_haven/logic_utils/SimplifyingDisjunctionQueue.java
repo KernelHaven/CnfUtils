@@ -10,6 +10,7 @@ import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory.Strategy;
 import net.ssehub.kernel_haven.cnf.IFormulaToCnfConverter;
 import net.ssehub.kernel_haven.cnf.SatSolver;
 import net.ssehub.kernel_haven.cnf.SolverException;
+import net.ssehub.kernel_haven.util.logic.DepthCalculator;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.DisjunctionQueue;
 import net.ssehub.kernel_haven.util.logic.Formula;
@@ -78,7 +79,16 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
                     
                     previous = new Disjunction(previous, current);
                     
-                } catch (ConverterException | SolverException | StackOverflowError e) {
+                } catch (StackOverflowError e) {
+                    LOGGER.logWarning(varName + " has a PC that is too deep:",
+                            "Current: " + new DepthCalculator().visit(current),
+                            "Previous: " + new DepthCalculator().visit(previous));
+                    
+                    // add current to be safe
+                    previous = new Disjunction(previous, current);
+                    helperQueue.add(current);
+                    
+                } catch (ConverterException | SolverException e) {
                     if (null != varName) {
                         LOGGER.logExceptionWarning("Error while creating disjunction for conditions of " + varName, e);
                     } else {
