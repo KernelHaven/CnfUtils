@@ -156,7 +156,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             
             // sat(previous AND !current)
             if (solver.isSatisfiable(converter.convert(and(previous, not(current))))) {
-                // neither previous nor current are subsets of each other -> consider both (add current)
+                // neither previous nor current are subsets of each other -> consider both
                 result = RelevancyType.BOTH_RELEVANT;
                 
             } else {
@@ -165,7 +165,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             }
             
         } else {
-            // false -> current is subset of previous -> ignore current (nothing to do)
+            // false -> current is subset of previous -> ignore current
             result = RelevancyType.PREVIOUS_RELEVANT;
         }
         
