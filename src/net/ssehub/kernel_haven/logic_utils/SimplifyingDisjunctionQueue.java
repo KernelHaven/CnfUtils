@@ -46,14 +46,18 @@ public void add(@Nullable Formula condition) {
     if (null != condition) {
         if (condition instanceof Disjunction) {
             LOGGER.logInfo2(getClass().getSimpleName(), " split condition into 2 elements.");
-            super.add(((Disjunction) condition).getLeft());
-            super.add(((Disjunction) condition).getRight());
+            add(((Disjunction) condition).getLeft());
+            add(((Disjunction) condition).getRight());
         } else if (condition instanceof Negation && ((Negation) condition).getFormula() instanceof Conjunction) {
             Conjunction inner = (Conjunction) ((Negation) condition).getFormula();
             LOGGER.logInfo2(getClass().getSimpleName(), " transforming negated conjunction.");
             
-            super.add(new Negation(inner.getLeft()));
-            super.add(new Negation(inner.getRight()));
+            Formula left = inner.getLeft();
+            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
+            add(left);
+            Formula right = inner.getRight();
+            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
+            add(right);
         } else {
             super.add(condition);
         }
