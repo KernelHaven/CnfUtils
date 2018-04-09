@@ -40,29 +40,29 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         converter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
     
-    // Experimantal: test if this brings an additional bonus in real environments
-@Override
-public void add(@Nullable Formula condition) {
-    if (null != condition) {
-        if (condition instanceof Disjunction) {
-            LOGGER.logInfo2(getClass().getSimpleName(), " split condition into 2 elements.");
-            add(((Disjunction) condition).getLeft());
-            add(((Disjunction) condition).getRight());
-        } else if (condition instanceof Negation && ((Negation) condition).getFormula() instanceof Conjunction) {
-            Conjunction inner = (Conjunction) ((Negation) condition).getFormula();
-            LOGGER.logInfo2(getClass().getSimpleName(), " transforming negated conjunction.");
-            
-            Formula left = inner.getLeft();
-            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
-            add(left);
-            Formula right = inner.getRight();
-            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
-            add(right);
-        } else {
-            super.add(condition);
-        }
-    }
-}
+//    // Experimantal: test if this brings an additional bonus in real environments
+//@Override
+//public void add(@Nullable Formula condition) {
+//    if (null != condition) {
+//        if (condition instanceof Disjunction) {
+//            LOGGER.logInfo2(getClass().getSimpleName(), " split condition into 2 elements.");
+//            add(((Disjunction) condition).getLeft());
+//            add(((Disjunction) condition).getRight());
+//        } else if (condition instanceof Negation && ((Negation) condition).getFormula() instanceof Conjunction) {
+//            Conjunction inner = (Conjunction) ((Negation) condition).getFormula();
+//            LOGGER.logInfo2(getClass().getSimpleName(), " transforming negated conjunction.");
+//            
+//            Formula left = inner.getLeft();
+//            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
+//            add(left);
+//            Formula right = inner.getRight();
+//            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
+//            add(right);
+//        } else {
+//            super.add(condition);
+//        }
+//    }
+//}
 
     @Override
     public @NonNull Formula getDisjunction(@Nullable String varName) {
