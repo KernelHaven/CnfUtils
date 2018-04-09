@@ -43,6 +43,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
 public void add(@Nullable Formula condition) {
     if (null != condition) {
         if (condition instanceof Disjunction) {
+            LOGGER.logInfo2(getClass().getSimpleName(), " split condition into 2 elements.");
             super.add(((Disjunction) condition).getLeft());
             super.add(((Disjunction) condition).getRight());
         } else {
