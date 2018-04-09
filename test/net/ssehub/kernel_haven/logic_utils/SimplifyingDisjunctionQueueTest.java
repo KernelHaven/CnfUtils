@@ -1,11 +1,16 @@
 package net.ssehub.kernel_haven.logic_utils;
 
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
+import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Arrays;
+
+import org.junit.Assert;
 import org.junit.Test;
 
+import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
 
@@ -78,7 +83,8 @@ public class SimplifyingDisjunctionQueueTest {
         queue.add(new Variable("VAR_B"));
         queue.add(or("VAR_A", "VAR_B"));
         
-        assertThat(queue.getDisjunction(), is(or("VAR_A", "VAR_B")));
+        assertDisjunction(or("VAR_A", "VAR_B"), queue.getDisjunction());
+        //assertThat(queue.getDisjunction(), is(or("VAR_A", "VAR_B")));
     }
     
     /**
@@ -94,4 +100,17 @@ public class SimplifyingDisjunctionQueueTest {
         assertThat(queue.getDisjunction(), is(or("VAR_A", "VAR_B")));
     }
     
+    /**
+     * Helper to test if a disjuntion is equivalent to another disjunction (splits the toplevel elements
+     * to allow reordering).
+     * @param expected The expected disjunction
+     * @param actual The tested disjunction
+     */
+    private static void assertDisjunction(Formula expected, Formula actual) {
+        String[] expectedElements = expected.toString().split("\\s*\\|\\|\\s*");
+        String[] actualElements = actual.toString().split("\\s*\\|\\|\\s*");
+        
+        Assert.assertEquals(expectedElements.length, actualElements.length);
+        assertThat(Arrays.asList(actualElements), hasItems(expectedElements));
+    }
 }
