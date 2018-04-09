@@ -37,6 +37,19 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         solver = new SatSolver();
         converter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
+    
+    // Experimantal: test if this brings an additional bonus in real environments
+@Override
+public void add(@Nullable Formula condition) {
+    if (null != condition) {
+        if (condition instanceof Disjunction) {
+            super.add(((Disjunction) condition).getLeft());
+            super.add(((Disjunction) condition).getRight());
+        } else {
+            super.add(condition);
+        }
+    }
+}
 
     @Override
     public @NonNull Formula getDisjunction(@Nullable String varName) {
