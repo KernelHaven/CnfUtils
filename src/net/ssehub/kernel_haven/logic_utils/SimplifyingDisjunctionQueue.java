@@ -10,9 +10,11 @@ import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory.Strategy;
 import net.ssehub.kernel_haven.cnf.IFormulaToCnfConverter;
 import net.ssehub.kernel_haven.cnf.SatSolver;
 import net.ssehub.kernel_haven.cnf.SolverException;
+import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.DisjunctionQueue;
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
@@ -46,6 +48,12 @@ public void add(@Nullable Formula condition) {
             LOGGER.logInfo2(getClass().getSimpleName(), " split condition into 2 elements.");
             super.add(((Disjunction) condition).getLeft());
             super.add(((Disjunction) condition).getRight());
+        } else if (condition instanceof Negation && ((Negation) condition).getFormula() instanceof Conjunction) {
+            Conjunction inner = (Conjunction) ((Negation) condition).getFormula();
+            LOGGER.logInfo2(getClass().getSimpleName(), " transforming negated conjunction.");
+            
+            super.add(new Negation(inner.getLeft()));
+            super.add(new Negation(inner.getRight()));
         } else {
             super.add(condition);
         }
