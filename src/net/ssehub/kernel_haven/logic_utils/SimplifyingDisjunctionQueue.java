@@ -212,7 +212,31 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             // sat(previous AND !current)
             if (solver.isSatisfiable(converter.convert(and(previous, not(current))))) {
                 // neither previous nor current are subsets of each other -> consider both
-                result = RelevancyType.BOTH_RELEVANT;
+                // Check if a sub formula is covered by previous 
+                if (current instanceof Disjunction) {
+                    Formula left = ((Disjunction) current).getLeft();
+                    Formula right = ((Disjunction) current).getRight();
+                    
+                    result = checkSubRelevancy(previous, left, right);
+                    if (null == result) {
+                        result = checkSubRelevancy(previous, right, left);
+                    }
+                } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
+                    // Transform: !(A AND B) into !A OR !B
+                    Conjunction inner = (Conjunction) ((Negation) current).getFormula();
+                    Formula left = inner.getLeft();
+                    left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
+                    Formula right = inner.getRight();
+                    right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
+                    
+                    result = checkSubRelevancy(previous, left, right);
+                    if (null == result) {
+                        result = checkSubRelevancy(previous, right, left);
+                    }
+                }
+                if (null == result) {
+                    result = RelevancyType.BOTH_RELEVANT;
+                }
                 
             } else {
                 // false -> previous is subset of current -> ignore previous (consider only current)
@@ -221,33 +245,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             
         } else {
             // false -> current is subset of previous -> ignore current
-            
-            // Check if a sub formula is covered by previous 
-            if (current instanceof Disjunction) {
-                Formula left = ((Disjunction) current).getLeft();
-                Formula right = ((Disjunction) current).getRight();
-                
-                result = checkSubRelevancy(previous, left, right);
-                if (null == result) {
-                    result = checkSubRelevancy(previous, right, left);
-                }
-            } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
-                // Transform: !(A AND B) into !A OR !B
-                Conjunction inner = (Conjunction) ((Negation) current).getFormula();
-                Formula left = inner.getLeft();
-                left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
-                Formula right = inner.getRight();
-                right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
-                
-                result = checkSubRelevancy(previous, left, right);
-                if (null == result) {
-                    result = checkSubRelevancy(previous, right, left);
-                }
-            }
-            
-            if (null == result) {
-                result = RelevancyType.PREVIOUS_RELEVANT;
-            }
+            result = RelevancyType.PREVIOUS_RELEVANT;
         }
         
         
