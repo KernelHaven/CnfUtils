@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -106,11 +108,36 @@ public class SimplifyingDisjunctionQueueTest {
      * is enabled.
      */
     @Test
-    public void testSubFormulaElemination() {
+    public void testSubFormulaEleminationForDisjunctions() {
         SimplifyingDisjunctionQueue queue = new SimplifyingDisjunctionQueue();
         
         @NonNull Formula input1 = or(or("VAR_A", "VAR_B"), "VAR_C");
         @NonNull Formula input2 = or(or("VAR_A", "VAR_B"), "VAR_D");
+        queue.add(input1);
+        queue.add(input2);
+        
+        Formula expected;
+        if (SimplifyingDisjunctionQueue.USE_RECURSIVE_SPLIT) {
+            // Expected: A or B or C or D
+            expected = or(or("VAR_A", "VAR_B"), or("VAR_C", "VAR_D"));
+        } else {
+            // Expected: (A or B or C) or (A or B or D)
+            expected = or(input1, input2);
+        }
+        
+        assertDisjunction(expected, queue.getDisjunction());
+    }
+    
+    /**
+     * Tests elimination of irrelevant sub-formulas if {@link SimplifyingDisjunctionQueue#USE_RECURSIVE_SPLIT}
+     * is enabled.
+     */
+    @Test
+    public void testSubFormulaEleminationForConjunctions() {
+        SimplifyingDisjunctionQueue queue = new SimplifyingDisjunctionQueue();
+        
+        @NonNull Formula input1 = or(or("VAR_A", "VAR_B"), "VAR_C");
+        @NonNull Formula input2 = or(not(and(not("VAR_D"), not("VAR_B"))), "VAR_A");
         queue.add(input1);
         queue.add(input2);
         
