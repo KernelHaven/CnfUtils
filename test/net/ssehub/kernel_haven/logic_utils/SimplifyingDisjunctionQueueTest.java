@@ -154,6 +154,31 @@ public class SimplifyingDisjunctionQueueTest {
     }
     
     /**
+     * Tests elimination of irrelevant sub-formulas if {@link SimplifyingDisjunctionQueue#USE_RECURSIVE_SPLIT}
+     * is enabled, but if nothing can be optimized.
+     */
+    @Test
+    public void testSubFormulaEleminationWithoutPotentialForImprovement() {
+        SimplifyingDisjunctionQueue queue = new SimplifyingDisjunctionQueue();
+        
+        @NonNull Formula input1 = or(or("VAR_A", "VAR_B"), "VAR_C");
+        @NonNull Formula input2 = or("VAR_D", "VAR_E");
+        queue.add(input1);
+        queue.add(input2);
+        
+        Formula expected = or(input1, input2);
+//        if (SimplifyingDisjunctionQueue.USE_RECURSIVE_SPLIT) {
+//            // Expected: A or B or C or D
+//            expected = or(or(or("VAR_A", "VAR_B"), or("VAR_C", "VAR_D"), "VAR_E"));
+//        } else {
+//            // Expected: (A or B or C) or (A or B or D)
+//            expected = or(input1, input2);
+//        }
+        
+        assertDisjunction(expected, queue.getDisjunction());
+    }
+    
+    /**
      * Helper to test if a disjunction is equivalent to another disjunction (splits the toplevel elements
      * to allow reordering).
      * @param expected The expected disjunction
