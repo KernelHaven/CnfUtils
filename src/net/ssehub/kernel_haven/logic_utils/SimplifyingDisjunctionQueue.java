@@ -183,14 +183,15 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         // two sat() calls to check if previous, current or both need to be considered
         
         // sat(!previous AND current)
-        if (solver.isSatisfiable(converter.convert(and(not(previous), current)))) {
+        Formula notPrevious = not(previous);
+        if (solver.isSatisfiable(converter.convert(and(notPrevious, current)))) {
             // true -> current is not subset of previous
             
             // sat(previous AND !current)
             if (solver.isSatisfiable(converter.convert(and(previous, not(current))))) {
                 // neither previous nor current are subsets of each other -> consider both
                 // Check if a sub formula is covered by previous 
-                result = USE_RECURSIVE_SPLIT ? recursiveRelevanceAnalysis(not(previous), current)
+                result = USE_RECURSIVE_SPLIT ? recursiveRelevanceAnalysis(notPrevious, current)
                     : RelevancyType.BOTH_RELEVANT;
                 if (null == result) {
                     result = RelevancyType.BOTH_RELEVANT;
