@@ -26,6 +26,7 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
  */
 public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
 
+    static final boolean USE_RECURSIVE_SPLIT = true;
     private @NonNull SatSolver solver;
     
     private @NonNull IFormulaToCnfConverter converter;
@@ -39,30 +40,6 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         solver = new SatSolver();
         converter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
-    
-//    // Experimantal: test if this brings an additional bonus in real environments
-//@Override
-//public void add(@Nullable Formula condition) {
-//    if (null != condition) {
-//        if (condition instanceof Disjunction) {
-//            LOGGER.logInfo2(getClass().getSimpleName(), " split condition into 2 elements.");
-//            add(((Disjunction) condition).getLeft());
-//            add(((Disjunction) condition).getRight());
-//        } else if (condition instanceof Negation && ((Negation) condition).getFormula() instanceof Conjunction) {
-//            Conjunction inner = (Conjunction) ((Negation) condition).getFormula();
-//            LOGGER.logInfo2(getClass().getSimpleName(), " transforming negated conjunction.");
-//            
-//            Formula left = inner.getLeft();
-//            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
-//            add(left);
-//            Formula right = inner.getRight();
-//            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
-//            add(right);
-//        } else {
-//            super.add(condition);
-//        }
-//    }
-//}
 
     @Override
     public @NonNull Formula getDisjunction(@Nullable String varName) {
@@ -213,27 +190,8 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             if (solver.isSatisfiable(converter.convert(and(previous, not(current))))) {
                 // neither previous nor current are subsets of each other -> consider both
                 // Check if a sub formula is covered by previous 
-                if (current instanceof Disjunction) {
-                    Formula left = ((Disjunction) current).getLeft();
-                    Formula right = ((Disjunction) current).getRight();
-                    
-                    result = checkSubRelevancy(previous, left, right);
-                    if (null == result) {
-                        result = checkSubRelevancy(previous, right, left);
-                    }
-                } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
-                    // Transform: !(A AND B) into !A OR !B
-                    Conjunction inner = (Conjunction) ((Negation) current).getFormula();
-                    Formula left = inner.getLeft();
-                    left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
-                    Formula right = inner.getRight();
-                    right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
-                    
-                    result = checkSubRelevancy(previous, left, right);
-                    if (null == result) {
-                        result = checkSubRelevancy(previous, right, left);
-                    }
-                }
+                result = USE_RECURSIVE_SPLIT ? recursiveRelevanceAnalysis(previous, current)
+                    : RelevancyType.BOTH_RELEVANT;
                 if (null == result) {
                     result = RelevancyType.BOTH_RELEVANT;
                 }
@@ -249,6 +207,46 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         }
         
         
+        return result;
+    }
+
+    /**
+     * Controls the recursion of {@link #checkRelevancy(Formula, Formula)},
+     * {@link #checkSubRelevancy(Formula, Formula, Formula)}. Maybe dis-/en-abled via {@link #USE_RECURSIVE_SPLIT}.
+     * @param previous All previously relevant formulas, OR'd together, won't be touched, required for sat checks.
+     * @param current The current element, which will be recursively split into smaller pieces as long either
+     *     a sub element is covered by previous or it cannot be cut into smaller pieces.
+     * 
+     * @return <tt>null</tt> if current does not contain any elements covered by previous or the remaining part which
+     *     must be added to previous (which does not contain the irrelevant part anymore).
+     * @throws ConverterException If CNF conversion fails.
+     * @throws SolverException If the SAT solver fails. 
+     */
+    private @Nullable SubRelevance recursiveRelevanceAnalysis(@NonNull Formula previous, @NonNull Formula current)
+        throws SolverException, ConverterException {
+        
+        SubRelevance result = null;
+        if (current instanceof Disjunction) {
+            Formula left = ((Disjunction) current).getLeft();
+            Formula right = ((Disjunction) current).getRight();
+            
+            result = checkSubRelevancy(previous, left, right);
+            if (null == result) {
+                result = checkSubRelevancy(previous, right, left);
+            }
+        } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
+            // Transform: !(A AND B) into !A OR !B
+            Conjunction inner = (Conjunction) ((Negation) current).getFormula();
+            Formula left = inner.getLeft();
+            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
+            Formula right = inner.getRight();
+            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
+            
+            result = checkSubRelevancy(previous, left, right);
+            if (null == result) {
+                result = checkSubRelevancy(previous, right, left);
+            }
+        }
         return result;
     }
     
@@ -275,27 +273,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             // true -> current is not subset of previous: continue recursion if possible
             
             // Recursion
-            if (current instanceof Disjunction) {
-                Formula left = ((Disjunction) current).getLeft();
-                Formula right = ((Disjunction) current).getRight();
-                
-                result = checkSubRelevancy(previous, left, right);
-                if (null == result) {
-                    result = checkSubRelevancy(previous, right, left);
-                }
-            } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
-                // Transform: !(A AND B) into !A OR !B
-                Conjunction inner = (Conjunction) ((Negation) current).getFormula();
-                Formula left = inner.getLeft();
-                left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
-                Formula right = inner.getRight();
-                right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
-                
-                result = checkSubRelevancy(previous, left, right);
-                if (null == result) {
-                    result = checkSubRelevancy(previous, right, left);
-                }
-            }
+            result = recursiveRelevanceAnalysis(previous, current);
         } else {
             // false -> current is subset of previous -> ignore current, keep base
             result = new SubRelevance(base);

@@ -13,6 +13,7 @@ import org.junit.Test;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
+import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
  * Tests the {@link SimplifyingDisjunctionQueue}.
@@ -101,7 +102,32 @@ public class SimplifyingDisjunctionQueueTest {
     }
     
     /**
-     * Helper to test if a disjuntion is equivalent to another disjunction (splits the toplevel elements
+     * Tests elimination of irrelevant sub-formulas if {@link SimplifyingDisjunctionQueue#USE_RECURSIVE_SPLIT}
+     * is enabled.
+     */
+    @Test
+    public void testSubFormulaElemination() {
+        SimplifyingDisjunctionQueue queue = new SimplifyingDisjunctionQueue();
+        
+        @NonNull Formula input1 = or(or("VAR_A", "VAR_B"), "VAR_C");
+        @NonNull Formula input2 = or(or("VAR_A", "VAR_B"), "VAR_D");
+        queue.add(input1);
+        queue.add(input2);
+        
+        Formula expected;
+        if (SimplifyingDisjunctionQueue.USE_RECURSIVE_SPLIT) {
+            // Expected: A or B or C or D
+            expected = or(or("VAR_A", "VAR_B"), or("VAR_C", "VAR_D"));
+        } else {
+            // Expected: (A or B or C) or (A or B or D)
+            expected = or(input1, input2);
+        }
+        
+        assertDisjunction(expected, queue.getDisjunction());
+    }
+    
+    /**
+     * Helper to test if a disjunction is equivalent to another disjunction (splits the toplevel elements
      * to allow reordering).
      * @param expected The expected disjunction
      * @param actual The tested disjunction
@@ -110,7 +136,8 @@ public class SimplifyingDisjunctionQueueTest {
         String[] expectedElements = expected.toString().split("\\s*\\|\\|\\s*");
         String[] actualElements = actual.toString().split("\\s*\\|\\|\\s*");
         
-        Assert.assertEquals(expectedElements.length, actualElements.length);
         assertThat(Arrays.asList(actualElements), hasItems(expectedElements));
+        Assert.assertEquals("Unexpected elements of literals/variables found:", expectedElements.length,
+                actualElements.length);
     }
 }
