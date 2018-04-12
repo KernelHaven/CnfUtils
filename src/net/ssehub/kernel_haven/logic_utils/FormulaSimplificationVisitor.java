@@ -300,7 +300,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
             left = null != tmp ? tmp : left;
         }
         if (right instanceof Disjunction) {
-            Formula tmp = nestedOrAbsorbtion(var, (Disjunction) left);
+            Formula tmp = nestedOrAbsorbtion(var, (Disjunction) right);
             right = null != tmp ? tmp : right;
         }
         
