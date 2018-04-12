@@ -83,26 +83,9 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
             result = True.INSTANCE;
         } else if (left instanceof Variable) {
             // Test for Absorption
-            if (right instanceof Conjunction) {
-                // Classical Absorption: A v (A ^ B) -> A
-                if (isOrAbsorbtion((Variable) left, (Conjunction) right)) {
-                    result = left;
-                }
-            } else if (right instanceof Disjunction) {
-                // Nested Absorption possible: A v (C v (A ^ B)) -> A v C
-                result = nestedOrAbsorbtion((Variable) left, (Disjunction) right);
-            }
+            result = orAbsorption((Variable) left, right);
         } else if (right instanceof Variable) {
-            // Test for Absorption
-            if (left instanceof Conjunction) {
-                //Classical Absorption: (A ^ B) v A -> A
-                if (isOrAbsorbtion((Variable) right, (Conjunction) left)) {
-                    result = right;
-                }
-            } else if (left instanceof Disjunction) {
-                // Nested Absorption possible: (C v (A ^ B)) v A -> A v C
-                result = nestedOrAbsorbtion((Variable) right, (Disjunction) left);
-            }
+            result = orAbsorption((Variable) right, left);
         }
         
         if (null == result) {
@@ -118,8 +101,30 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         return result;
     }
 
+    /**
+     * Tests and applies the various kinds of absorption rules for a {@link Disjunction}.
+     * @param left The variable to be tested.
+     * @param right A formula to test whether the variable absorbs it.
+     * @return A new formula if the absorption rule was successfully applied, or <tt>null</tt>.
+     */
+    private @Nullable Formula orAbsorption(@NonNull Variable left, @NonNull Formula right) {
+        Formula result = null;
+        if (right instanceof Conjunction) {
+            // Classical Absorption: A v (A ^ B) -> A
+            if (isOrAbsorbtion(left, (Conjunction) right)) {
+                result = left;
+            }
+        } else if (right instanceof Disjunction) {
+            // Nested Absorption possible: A v (C v (A ^ B)) -> A v C
+            result = nestedOrAbsorbtion(left, (Disjunction) right);
+        }
+        return result;
+    }
+
+    // CHECKSTYLE:OFF
     @Override
     public Formula visitConjunction(@NonNull Conjunction formula) {
+    // CHECKSTYLE:ON
         Formula left = NullHelpers.notNull(formula.getLeft().accept(this));
         Formula right = NullHelpers.notNull(formula.getRight().accept(this));
         
@@ -148,25 +153,47 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
             
         } else if (left instanceof Variable) {         
             // Test for Absorption
-            if (right instanceof Disjunction) {
-                // Classical Absorption: A ^ (A v B) -> A
-                if (isAndAbsorption((Variable) left, (Disjunction) right)) {
-                    result = left;
-                }
-            } else if (right instanceof Conjunction) {
-                // Nested Absorption possible: A ^ (C ^ (A v B)) -> A ^ C
-                result = nestedAndAbsorbtion((Variable) left, (Conjunction) right);
-            }
+            result = andAbsorption((Variable) left, right);
         } else if (right instanceof Variable) {
-            // Test for Absorption
-            if (left instanceof Disjunction) {
-                // Classical Absorption: (A v B) ^ A -> A
-                if (isAndAbsorption((Variable) right, (Disjunction) left)) {
-                    result = right;
+            result = andAbsorption((Variable) right, left);
+            
+        } else if (left instanceof Negation && right instanceof Negation) {
+            Formula negatedLeft = ((Negation) left).getFormula();
+            Formula negatedRight = ((Negation) right).getFormula();
+            
+            // Test for (negated) Absorption
+            if (negatedLeft instanceof Variable && negatedRight instanceof Conjunction) {
+                // Transform negated conjunction into disjunction
+                Formula innerLeft = ((Conjunction) negatedRight).getLeft();
+                innerLeft = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
+                    : new Negation(innerLeft);
+                Formula innerRight = ((Conjunction) negatedRight).getRight();
+                innerRight = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
+                    : new Negation(innerRight);
+                
+                if (negatedLeft.equals(innerLeft)) {
+                    result = new Conjunction(left, innerRight);
+                    result = result.accept(this);
+                } else if (negatedLeft.equals(innerRight)) {
+                    result = new Conjunction(left, innerLeft);
+                    result = result.accept(this);
                 }
-            } else if (left instanceof Conjunction) {
-                // Nested Absorption possible: (C ^ (A v B)) ^ A -> A ^ C
-                result = nestedAndAbsorbtion((Variable) right, (Conjunction) left);
+            } else if (negatedRight instanceof Variable && negatedLeft instanceof Conjunction) {
+                // Transform negated conjunction into disjunction
+                Formula innerLeft = ((Conjunction) negatedLeft).getLeft();
+                innerLeft = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
+                    : new Negation(innerLeft);
+                Formula innerRight = ((Conjunction) negatedLeft).getRight();
+                innerRight = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
+                    : new Negation(innerRight);
+                
+                if (negatedRight.equals(innerLeft)) {
+                    result = new Conjunction(right, innerRight);
+                    result = result.accept(this);
+                } else if (negatedRight.equals(innerRight)) {
+                    result = new Conjunction(right, innerLeft);
+                    result = result.accept(this);
+                }
             }
         }
         
@@ -180,6 +207,26 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
             }
         }
         
+        return result;
+    }
+
+    /**
+     * Tests and applies the various kinds of absorption rules for a {@link Conjunction}.
+     * @param left The variable to be tested.
+     * @param right A formula to test whether the variable absorbs it.
+     * @return A new formula if the absorption rule was successfully applied, or <tt>null</tt>.
+     */
+    private Formula andAbsorption(@NonNull Variable left, @NonNull Formula right) {
+        Formula result = null;
+        if (right instanceof Disjunction) {
+            // Classical Absorption: A ^ (A v B) -> A
+            if (isAndAbsorption(left, (Disjunction) right)) {
+                result = left;
+            }
+        } else if (right instanceof Conjunction) {
+            // Nested Absorption possible: A ^ (C ^ (A v B)) -> A ^ C
+            result = nestedAndAbsorbtion(left, (Conjunction) right);
+        }
         return result;
     }
 

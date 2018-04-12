@@ -83,6 +83,10 @@ public class FormulaSimplificationVisitorTest {
             {not(True.INSTANCE), False.INSTANCE, "Negation on Constant"},
             {not(False.INSTANCE), True.INSTANCE, "Negation on Constant"},
             
+            // Combinations
+            {and(not("A"), not(and(not("A"), "B"))), and(not("A"), not("B")), "Negation/Absorption \u2227"},
+            {and(not(and(not("A"), "B")), not("A")), and(not("A"), not("B")), "Negation/Absorption \u2227"},
+            
             // Complex / scenario tests
             {or("A", or(and("C", or("D", "E")), and("A", "B"))), or(and("C", or("D", "E")), "A"), "Complex Absorbtion"},
             {or(or(or("D", "E"), "F"), "D"), or(or(or("D", "E"), "F"), "D"), "Unbalanced OR-Tree"},
