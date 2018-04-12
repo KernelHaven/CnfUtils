@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
     FormulaToExpressionConverterTest.class,
     LogicUtilsTest.class,
     SimplifyingDisjunctionQueueTest.class,
+    FormulaSimplificationVisitorTest.class,
     })
 public class AllLogicTests {
 
