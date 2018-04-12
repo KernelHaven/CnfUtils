@@ -10,6 +10,7 @@ import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.NullHelpers;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * Creates a more concise formula based on the visited input formula.
@@ -144,6 +145,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         } else if (right instanceof Negation && ((Negation) right).getFormula().equals(left)) {
             // Complementation: A ^ !A -> false
             result = False.INSTANCE;
+            
         } else if (left instanceof Variable) {         
             // Test for Absorption
             if (right instanceof Disjunction) {
@@ -216,7 +218,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
      * @param conjunction The conjunction to test (right side of the example).
      * @return The simplified structure or <tt>null</tt> if the absorption rule could not be found.
      */
-    private Formula nestedAndAbsorbtion(@NonNull Variable var, Conjunction conjunction) {
+    private @Nullable Formula nestedAndAbsorbtion(@NonNull Variable var, Conjunction conjunction) {
         Formula left = conjunction.getLeft();
         @NonNull Formula right = conjunction.getRight();
         
@@ -229,10 +231,12 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         
         // Recursive part
         if (left instanceof Disjunction) {
-            left = nestedAndAbsorbtion(var, (Conjunction) left);
+            Formula tmp = nestedAndAbsorbtion(var, (Conjunction) left);
+            left = null != tmp ? tmp : left;
         }
         if (right instanceof Disjunction) {
-            left = nestedAndAbsorbtion(var, (Conjunction) right);
+            Formula tmp = nestedAndAbsorbtion(var, (Conjunction) right);
+            right = null != tmp ? tmp : right;
         }
         
         // Return new (simplified) conjunction only if one of the sides has been changed
@@ -279,7 +283,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
      * @param disjunction The disjunction to test (right side of the example).
      * @return The simplified structure or <tt>null</tt> if the absorption rule could not be found.
      */
-    private Formula nestedOrAbsorbtion(@NonNull Variable var, Disjunction disjunction) {
+    private @Nullable Formula nestedOrAbsorbtion(@NonNull Variable var, Disjunction disjunction) {
         Formula left = disjunction.getLeft();
         @NonNull Formula right = disjunction.getRight();
         
@@ -292,10 +296,12 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         
         // Recursive part
         if (left instanceof Disjunction) {
-            left = nestedOrAbsorbtion(var, (Disjunction) left);
+            Formula tmp = nestedOrAbsorbtion(var, (Disjunction) left);
+            left = null != tmp ? tmp : left;
         }
         if (right instanceof Disjunction) {
-            left = nestedOrAbsorbtion(var, (Disjunction) right);
+            Formula tmp = nestedOrAbsorbtion(var, (Disjunction) left);
+            right = null != tmp ? tmp : right;
         }
         
         // Return new (simplified) disjunction only if one of the sides has been changed

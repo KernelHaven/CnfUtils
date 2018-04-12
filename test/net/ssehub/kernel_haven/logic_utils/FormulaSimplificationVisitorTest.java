@@ -85,6 +85,10 @@ public class FormulaSimplificationVisitorTest {
             
             // Complex / scenario tests
             {or("A", or(and("C", or("D", "E")), and("A", "B"))), or(and("C", or("D", "E")), "A"), "Complex Absorbtion"},
+            {or(or(or("D", "E"), "F"), "D"), or(or(or("D", "E"), "F"), "D"), "Unbalanced OR-Tree"},
+            {and(or(and("A", "B"), "C"), or(or("D", "E"), or("F", "D"))),
+                and(or(and("A", "B"), "C"), or(or("D", "E"), or("F", "D"))), "Complex keeps same"},
+            
         });
     }
     
