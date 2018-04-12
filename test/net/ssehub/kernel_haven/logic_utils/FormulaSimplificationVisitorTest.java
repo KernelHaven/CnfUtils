@@ -80,6 +80,8 @@ public class FormulaSimplificationVisitorTest {
             // Negations
             {not("A"), not("A"), "Negation"},
             {not(not("A")), varA, "Double negation"},
+            {not(True.INSTANCE), False.INSTANCE, "Negation on Constant"},
+            {not(False.INSTANCE), True.INSTANCE, "Negation on Constant"},
             
             // Complex / scenario tests
             {or("A", or(and("C", or("D", "E")), and("A", "B"))), or(and("C", or("D", "E")), "A"), "Complex Absorbtion"},
