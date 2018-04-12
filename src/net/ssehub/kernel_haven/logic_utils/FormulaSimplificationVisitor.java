@@ -230,11 +230,11 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         }
         
         // Recursive part
-        if (left instanceof Disjunction) {
+        if (left instanceof Conjunction) {
             Formula tmp = nestedAndAbsorbtion(var, (Conjunction) left);
             left = null != tmp ? tmp : left;
         }
-        if (right instanceof Disjunction) {
+        if (right instanceof Conjunction) {
             Formula tmp = nestedAndAbsorbtion(var, (Conjunction) right);
             right = null != tmp ? tmp : right;
         }
