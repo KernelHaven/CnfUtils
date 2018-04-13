@@ -89,7 +89,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         }
         
         if (null == result) {
-            if (formula.getLeft().equals(left) && formula.getRight().equals(right)) {
+            if (formula.getLeft() == left && formula.getRight() == right) {
                 // There was no simplification, keep old formula.
                 result = formula;
             } else {
@@ -198,7 +198,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         }
         
         if (null == result) {
-            if (formula.getLeft().equals(left) && formula.getRight().equals(right)) {
+            if (formula.getLeft() == left && formula.getRight() == right) {
                 // There was no simplification, keep old formula.
                 result = formula;
             } else {
@@ -287,7 +287,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         }
         
         // Return new (simplified) conjunction only if one of the sides has been changed
-        if (!left.equals(conjunction.getLeft()) || !right.equals(conjunction.getRight())) {
+        if (left != conjunction.getLeft() || right != conjunction.getRight()) {
             result = new Conjunction(left, right);
             result = result.accept(this);
         }
@@ -352,7 +352,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         }
         
         // Return new (simplified) disjunction only if one of the sides has been changed
-        if (!left.equals(disjunction.getLeft()) || !right.equals(disjunction.getRight())) {
+        if (left != disjunction.getLeft() || right != disjunction.getRight()) {
             result = new Disjunction(left, right);
             result = result.accept(this);
         }

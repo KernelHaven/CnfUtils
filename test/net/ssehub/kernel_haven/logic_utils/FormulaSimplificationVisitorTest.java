@@ -62,6 +62,8 @@ public class FormulaSimplificationVisitorTest {
             {and(or("A", "B"), "A"), varA, "Absorption \u2227"},
             {and("A", and(or("A", "B"), "C")), and("A", "C"), "Nested Absorption \u2227"},
             {and(and(or("A", "B"), "C"), "A"), and("A", "C"), "Nested Absorption \u2227"},
+            {and(not(not("A")), "B"), and("A", "B"), "Rewrite Simplified \u2227"},
+            {and("B", not(not("A"))), and("B", "A"), "Rewrite Simplified \u2227"},
             
             // Disjunctions
             {or("A", "B"), or("A", "B"), "OR"},
@@ -76,6 +78,8 @@ public class FormulaSimplificationVisitorTest {
             {or(and("A", "B"), "A"), varA, "Absorption \u2228"},
             {or("A", or(and("A", "B"), "C")), or("A", "C"), "Nested Absorption \u2228"},
             {or(or(and("A", "B"), "C"), "A"), or("A", "C"), "Nested Absorption \u2228"},
+            {or(not(not("A")), "B"), or("A", "B"), "Rewrite Simplified \u2228"},
+            {or("B", not(not("A"))), or("B", "A"), "Rewrite Simplified \u2228"},
             
             // Negations
             {not("A"), not("A"), "Negation"},
