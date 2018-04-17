@@ -90,6 +90,29 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
             result = orAbsorption((Variable) left, right);
         } else if (right instanceof Variable) {
             result = orAbsorption((Variable) right, left);
+            
+        } else if (left instanceof Negation && right instanceof Negation) {
+            Formula negatedLeft = ((Negation) left).getFormula();
+            Formula negatedRight = ((Negation) right).getFormula();
+            
+            // Test for (negated) Absorption
+            if (negatedLeft instanceof Variable && negatedRight instanceof Disjunction) {
+                // Pull negation up and try to apply absorption to inner part 
+                result = negatedOrAbsorption((Negation) left, (Variable) negatedLeft, (Disjunction) negatedRight);
+                
+                if (null == result) {
+                    // Check for combination of complementation, De Morgan, Identity
+                    result = negatedOrComplementation((Negation) left, (Disjunction) negatedRight);
+                }
+            } else if (negatedRight instanceof Variable && negatedLeft instanceof Disjunction) {
+                // Pull negation up and try to apply absorption to inner part 
+                result = negatedOrAbsorption((Negation) right, (Variable) negatedRight, (Disjunction) negatedLeft);
+                
+                if (null == result) {
+                    // Check for combination of complementation, De Morgan, Identity
+                    result = negatedOrComplementation((Negation) right, (Disjunction) negatedLeft);
+                }
+            }
         }
         
         if (null == result) {
@@ -201,14 +224,16 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
     /**
      * Checks and resolves a negated AND absorption.
      * Does the following transformations:<br/>
-     * <pre><code>   !A &and; !(A &and; C)
-     * &rarr; !(A &and; (A &or; C))
+     * <pre><code>   !A &and; !(A &and; B)
+     * &rarr; !(A &or; (A &and; B))
+     * &rarr; !((A &and; A) &or; (A &and; B))
+     * &rarr; !(A &or; (A &and; B))
      * &rarr; !(A)
      * &rarr; !A</code></pre>
      * 
      * @param negatedVar The negated variable (<tt>!A</tt> in the example).
      * @param unpackedVar The variable without the negation (<tt>A</tt> in the example).
-     * @param negatedConjunction The conjunction to test (<tt>!(!A &and; !C)</tt> in the example).
+     * @param negatedConjunction The conjunction to test (<tt>(A &and; B)</tt> in the example).
      * @return A simplified formula or <tt>null</tt> if the case could not be found.
      */
     private Formula negatedAndAbsorption(@NonNull Negation negatedVar, @NonNull Variable unpackedVar,
@@ -339,6 +364,68 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
         // Return new (simplified) conjunction only if one of the sides has been changed
         if (left != conjunction.getLeft() || right != conjunction.getRight()) {
             result = new Conjunction(left, right);
+            result = result.accept(this);
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Checks and resolves a negated OR absorption.
+     * Does the following transformations:<br/>
+     * <pre><code>   !A &or; !(A &or; B)
+     * &rarr; !(A &and; (A &or; B))
+     * &rarr; !(A)
+     * &rarr; !A</code></pre>
+     * 
+     * @param negatedVar The negated variable (<tt>!A</tt> in the example).
+     * @param unpackedVar The variable without the negation (<tt>A</tt> in the example).
+     * @param negatedDisjunction The disjunction to test (<tt>(A &or; B)</tt> in the example).
+     * @return A simplified formula or <tt>null</tt> if the case could not be found.
+     */
+    private Formula negatedOrAbsorption(@NonNull Negation negatedVar, @NonNull Variable unpackedVar,
+        @NonNull Disjunction negatedDisjunction) {
+        
+        Formula result = null;
+        Formula innerLeft = negatedDisjunction.getLeft();
+        Formula innerRight = negatedDisjunction.getRight();
+        
+        if (unpackedVar.equals(innerLeft) || unpackedVar.equals(innerRight)) {
+            result = negatedVar;
+        }
+        return result;
+    }
+    
+    /**
+     * Checks and resolves a negated OR complementation, identity, De Morgan.
+     * Does the following transformations:<br/>
+     * <pre><code>   !A &or; !(!A &or; B)
+     * &rarr; !A &or; (A &and; !B)          | De Morgan, Double Negation
+     * &rarr; (!A &or; A) &and; (!A &or; !B)   | Distribution
+     * &rarr; (!A &or; !B)              | Complementation, Identity &or;</code></pre>
+     *
+     * @param negatedVar The negated variable (<tt>!A</tt> in the example).
+     * @param negatedDisjunction The disjunction to test (<tt>(A &or; B)</tt> in the example).
+     * @return A simplified formula or <tt>null</tt> if the case could not be found.
+     */
+    public Formula negatedOrComplementation(@NonNull Negation negatedVar, @NonNull Disjunction negatedDisjunction) {
+        
+        Formula result = null;
+        Formula innerLeft = negatedDisjunction.getLeft();
+        Formula innerRight = negatedDisjunction.getRight();
+        
+        if (negatedVar.equals(innerLeft)) {
+            Formula right = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
+                : new Negation(innerRight);
+            result = new Disjunction(negatedVar, right);
+        } else if (negatedVar.equals(innerRight)) {
+            Formula right = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
+                    : new Negation(innerLeft);
+            result = new Disjunction(negatedVar, right);
+        }
+        
+        if (null != result) {
+            // Try to simplify the new result
             result = result.accept(this);
         }
         
