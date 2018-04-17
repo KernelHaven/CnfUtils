@@ -14,7 +14,11 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * Creates a more concise formula based on the visited input formula.
- * If the formula cannot be simplified, the same instance is returned.
+ * If the formula cannot be simplified, the same instance is returned. <br/><br/>
+ * 
+ * Applies rules of the <a href="https://en.wikipedia.org/wiki/Boolean_algebra#Laws">Boolean algebra</a> and
+ * combinations of these rules.
+ * 
  * @author El-Sharkawy
  *
  */
@@ -163,36 +167,20 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
             
             // Test for (negated) Absorption
             if (negatedLeft instanceof Variable && negatedRight instanceof Conjunction) {
-                // Transform negated conjunction into disjunction
-                Formula innerLeft = ((Conjunction) negatedRight).getLeft();
-                innerLeft = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
-                    : new Negation(innerLeft);
-                Formula innerRight = ((Conjunction) negatedRight).getRight();
-                innerRight = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
-                    : new Negation(innerRight);
+                // Pull negation up and try to apply absorption to inner part 
+                result = negatedAndAbsorption((Negation) left, (Variable) negatedLeft, (Conjunction) negatedRight);
                 
-                if (negatedLeft.equals(innerLeft)) {
-                    result = new Conjunction(left, innerRight);
-                    result = result.accept(this);
-                } else if (negatedLeft.equals(innerRight)) {
-                    result = new Conjunction(left, innerLeft);
-                    result = result.accept(this);
+                if (null == result) {
+                    // Check for combination of complementation, De Morgan, Identity: !A ^ !(!A ^ B) -> !A ^ !B
+                    result = negatedAndComplementation((Negation) left, (Conjunction) negatedRight);
                 }
             } else if (negatedRight instanceof Variable && negatedLeft instanceof Conjunction) {
-                // Transform negated conjunction into disjunction
-                Formula innerLeft = ((Conjunction) negatedLeft).getLeft();
-                innerLeft = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
-                    : new Negation(innerLeft);
-                Formula innerRight = ((Conjunction) negatedLeft).getRight();
-                innerRight = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
-                    : new Negation(innerRight);
+                // Pull negation up and try to apply absorption to inner part 
+                result = negatedAndAbsorption((Negation) right, (Variable) negatedRight, (Conjunction) negatedLeft);
                 
-                if (negatedRight.equals(innerLeft)) {
-                    result = new Conjunction(right, innerRight);
-                    result = result.accept(this);
-                } else if (negatedRight.equals(innerRight)) {
-                    result = new Conjunction(right, innerLeft);
-                    result = result.accept(this);
+                if (null == result) {
+                    // Check for combination of complementation, De Morgan, Identity: !(!A ^ B) ^ !A -> !B ^ !A
+                    result = negatedAndComplementation((Negation) right, (Conjunction) negatedLeft);
                 }
             }
         }
@@ -205,6 +193,68 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
                 // There was some (unknown) simplification, create new conjunction
                 result = new Conjunction(left, right);
             }
+        }
+        
+        return result;
+    }
+
+    /**
+     * Checks and resolves a negated AND absorption.
+     * Does the following transformations:<br/>
+     * <pre><code>   !A &and; !(A &and; C)
+     * &rarr; !(A &and; (A &or; C))
+     * &rarr; !(A)
+     * &rarr; !A</code></pre>
+     * 
+     * @param negatedVar The negated variable (<tt>!A</tt> in the example).
+     * @param unpackedVar The variable without the negation (<tt>A</tt> in the example).
+     * @param negatedConjunction The conjunction to test (<tt>!(!A &and; !C)</tt> in the example).
+     * @return A simplified formula or <tt>null</tt> if the case could not be found.
+     */
+    private Formula negatedAndAbsorption(@NonNull Negation negatedVar, @NonNull Variable unpackedVar,
+        @NonNull Conjunction negatedConjunction) {
+        
+        Formula result = null;
+        Formula innerLeft = negatedConjunction.getLeft();
+        Formula innerRight = negatedConjunction.getRight();
+        
+        if (unpackedVar.equals(innerLeft) || unpackedVar.equals(innerRight)) {
+            result = negatedVar;
+        }
+        return result;
+    }
+    
+    /**
+     * Checks and resolves a negated AND complementation, identity, De Morgan.
+     * Does the following transformations:<br/>
+     * <pre><code>   !A &and; !(!A &and; B)
+     * &rarr; !A &and; (A &or; !B)          | De Morgan, Double Negation
+     * &rarr; (!A &and; A) &or; (!A &and; !B)   | Distribution
+     * &rarr; (!A &and; !B)              | Complementation, Identity &or;</code></pre>
+     *
+     * @param negatedVar The negated variable (<tt>!A</tt> in the example).
+     * @param negatedConjunction The conjunction to test (<tt>!(!A &and; B)</tt> in the example).
+     * @return A simplified formula or <tt>null</tt> if the case could not be found.
+     */
+    public Formula negatedAndComplementation(@NonNull Negation negatedVar, @NonNull Conjunction negatedConjunction) {
+        
+        Formula result = null;
+        Formula innerLeft = negatedConjunction.getLeft();
+        Formula innerRight = negatedConjunction.getRight();
+        
+        if (negatedVar.equals(innerLeft)) {
+            Formula right = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
+                : new Negation(innerRight);
+            result = new Conjunction(negatedVar, right);
+        } else if (negatedVar.equals(innerRight)) {
+            Formula right = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
+                    : new Negation(innerLeft);
+            result = new Conjunction(negatedVar, right);
+        }
+        
+        if (null != result) {
+            // Try to simplify the new result
+            result = result.accept(this);
         }
         
         return result;

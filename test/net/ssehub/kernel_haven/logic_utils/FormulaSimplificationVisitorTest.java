@@ -62,8 +62,12 @@ public class FormulaSimplificationVisitorTest {
             {and(or("A", "B"), "A"), varA, "Absorption \u2227"},
             {and("A", and(or("A", "B"), "C")), and("A", "C"), "Nested Absorption \u2227"},
             {and(and(or("A", "B"), "C"), "A"), and("A", "C"), "Nested Absorption \u2227"},
+            {and(not("A"), not(and("A", "B"))), not("A"), "Negated Absorption \u2227"},
+            {and(not(and("A", "B")), not("A")), not("A"), "Negated Absorption \u2227"},
             {and(not(not("A")), "B"), and("A", "B"), "Rewrite Simplified \u2227"},
             {and("B", not(not("A"))), and("B", "A"), "Rewrite Simplified \u2227"},
+            {and(not("A"), not(and(not("A"), "B"))), and(not("A"), not("B")), "Negation/Complement/Identity \u2227"},
+            {and(not(and(not("A"), "B")), not("A")), and(not("A"), not("B")), "Negation/Complement/Identity \u2227"},
             
             // Disjunctions
             {or("A", "B"), or("A", "B"), "OR"},
@@ -86,11 +90,7 @@ public class FormulaSimplificationVisitorTest {
             {not(not("A")), varA, "Double negation"},
             {not(True.INSTANCE), False.INSTANCE, "Negation on Constant"},
             {not(False.INSTANCE), True.INSTANCE, "Negation on Constant"},
-            
-            // Combinations
-            {and(not("A"), not(and(not("A"), "B"))), and(not("A"), not("B")), "Negation/Absorption \u2227"},
-            {and(not(and(not("A"), "B")), not("A")), and(not("A"), not("B")), "Negation/Absorption \u2227"},
-            
+
             // Complex / scenario tests
             {or("A", or(and("C", or("D", "E")), and("A", "B"))), or(and("C", or("D", "E")), "A"), "Complex Absorbtion"},
             {or(or(or("D", "E"), "F"), "D"), or(or(or("D", "E"), "F"), "D"), "Unbalanced OR-Tree"},
