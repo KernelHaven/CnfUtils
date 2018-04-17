@@ -59,11 +59,26 @@ public class LogicUtils {
         return result;
     }
     
+    
+    /**
+     * Simplifies the given {@link Formula} with the {@link FormulaSimplificationVisitor}. The semantics do not change.
+     * 
+     * @param formula The formula to simplify. Must not be <code>null</code>.
+     * 
+     * @return The simplified formula. Not <code>null</code>.
+     * @see <a href="https://github.com/bpodgursky/jbool_expressions">
+     * https://github.com/bpodgursky/jbool_expressions</a>
+     */
+    public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
+        return formula.accept(new FormulaSimplificationVisitor());
+    }
+    
     /**
      * Initialization method called by KernelHaven. See loadClasses.txt
      */
     public static void initialize() {
-        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
+//        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
+        FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithVisitor);
     }
     
 }

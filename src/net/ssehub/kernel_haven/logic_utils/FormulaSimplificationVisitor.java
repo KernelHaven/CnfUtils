@@ -22,7 +22,7 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
  * @author El-Sharkawy
  *
  */
-public class FormulaSimplificationVisitor implements IFormulaVisitor<Formula> {
+public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Formula> {
 
     @Override
     public Formula visitFalse(@NonNull False falseConstant) {
