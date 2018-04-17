@@ -70,8 +70,8 @@ public class LogicUtils {
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
-        Formula firstSimplification = formula.accept(new FormulaSimplificationVisitor());
-        return simplify(firstSimplification);
+        Formula firstSimplification = simplify(formula);
+        return firstSimplification.accept(new FormulaSimplificationVisitor());
     }
     
     /**
