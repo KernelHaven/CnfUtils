@@ -78,8 +78,8 @@ public class LogicUtils {
      * Initialization method called by KernelHaven. See loadClasses.txt
      */
     public static void initialize() {
-        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
-//        FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithVisitor);
+//        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
+        FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithVisitor);
     }
     
 }
