@@ -26,7 +26,8 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
  */
 public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
 
-    static final boolean USE_RECURSIVE_SPLIT = true;
+    static final boolean USE_RECURSIVE_SPLIT = false; // when enabling, also comment code in checkRelevancy() back in
+    
     private @NonNull SatSolver solver;
     
     private @NonNull IFormulaToCnfConverter converter;
@@ -190,12 +191,15 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             // sat(previous AND !current)
             if (solver.isSatisfiable(converter.convert(and(previous, not(current))))) {
                 // neither previous nor current are subsets of each other -> consider both
+                result = RelevancyType.BOTH_RELEVANT;
+                
                 // Check if a sub formula is covered by previous 
-                result = USE_RECURSIVE_SPLIT ? recursiveRelevanceAnalysis(notPrevious, current)
-                    : RelevancyType.BOTH_RELEVANT;
-                if (null == result) {
-                    result = RelevancyType.BOTH_RELEVANT;
-                }
+                // TODO: there seems to be an error here
+//                result = USE_RECURSIVE_SPLIT ? recursiveRelevanceAnalysis(notPrevious, current)
+//                    : RelevancyType.BOTH_RELEVANT;
+//                if (null == result) {
+//                    result = RelevancyType.BOTH_RELEVANT;
+//                }
                 
             } else {
                 // false -> previous is subset of current -> ignore previous (consider only current)
