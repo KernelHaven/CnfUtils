@@ -129,6 +129,33 @@ public class FormulaEqualityCheckerTest {
         
         assertThat(checker.isLogicallyEqual(f, dnf), is(true));
     }
+    
+    /**
+     * Tests equality of formulas, with one containing an irrelevant variable.
+     * 
+     * @throws ConverterException unwanted.
+     * @throws SolverException unwanted.
+     */
+    @Test
+    public void testIrrelevantVariable() throws SolverException, ConverterException {
+        FormulaEqualityChecker checker = new FormulaEqualityChecker();
+        
+        /*
+         *  A | B | C | (A || B) || (!C && A) | (A || B)
+         * ---+---+---+-----------------------+----------
+         *  0 | 0 | 0 |       0               | 0
+         *  0 | 0 | 1 |       0               | 0
+         *  0 | 1 | 0 |       1               | 1
+         *  0 | 1 | 1 |       1               | 1
+         *  1 | 0 | 0 |       1               | 1
+         *  1 | 0 | 1 |       1               | 1
+         *  1 | 1 | 0 |       1               | 1
+         *  1 | 1 | 1 |       1               | 1
+         */
+        
+        assertThat(checker.isLogicallyEqual(or(or("A", "B"), and(not("C"), "A")),
+                or("A", "B")), is(true));
+    }
 
     // TODO: more test cases
     
