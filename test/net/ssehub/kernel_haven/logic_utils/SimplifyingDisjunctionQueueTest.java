@@ -1,7 +1,7 @@
 package net.ssehub.kernel_haven.logic_utils;
 
-import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
+import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
@@ -12,6 +12,7 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
+import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
@@ -60,7 +61,7 @@ public class SimplifyingDisjunctionQueueTest {
     public void testEmpty() {
         SimplifyingDisjunctionQueue queue = new SimplifyingDisjunctionQueue();
         
-        assertThat(queue.getDisjunction(), is(True.INSTANCE));
+        assertThat(queue.getDisjunction(), is(False.INSTANCE));
     }
     
     /**

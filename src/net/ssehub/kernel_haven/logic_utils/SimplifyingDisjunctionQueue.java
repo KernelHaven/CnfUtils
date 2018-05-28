@@ -13,6 +13,7 @@ import net.ssehub.kernel_haven.cnf.SolverException;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.DisjunctionQueue;
+import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
@@ -47,8 +48,10 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         Formula result;
         
         // Create disjunction of all elements
-        if (isTrue || queue.isEmpty()) {
+        if (isTrue) {
             result = True.INSTANCE;
+        } else if (queue.isEmpty()) {
+            result = False.INSTANCE;
         } else {
             // all previously considered formulas ORd together (used in sat calls). 
             Formula previous = notNull(queue.poll());
@@ -60,14 +63,12 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
                 IRelevancyType relevancy;
                 try {
                     relevancy = checkRelevancy(previous, current);
-                    
                 } catch (ConverterException | SolverException e) {
                     if (null != varName) {
                         LOGGER.logExceptionWarning("Error while creating disjunction for conditions of " + varName, e);
                     } else {
                         LOGGER.logExceptionWarning("Error while creating disjunction", e);
                     }
-                    
                     // consider both, to be safe
                     relevancy = RelevancyType.BOTH_RELEVANT;
                 }
