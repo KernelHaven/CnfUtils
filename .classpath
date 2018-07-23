@@ -5,7 +5,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/KernelHaven"/>
-	<classpathentry kind="lib" path="lib/include/sat4j-core-2.3.5.jar" sourcepath="lib/include/org.ow2.sat4j.core-2.3.5-sources.jar"/>
+	<classpathentry kind="lib" path="lib/include/sat4j-core-2.3.5.jar" sourcepath="lib/org.ow2.sat4j.core-2.3.5-sources.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-lang-2.5.jar"/>
 	<classpathentry kind="lib" path="lib/include/commons-lang3-3.6.jar"/>
 	<classpathentry kind="lib" path="lib/include/guava-14.0.jar"/>
