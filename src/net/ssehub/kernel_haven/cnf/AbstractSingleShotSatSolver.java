@@ -6,28 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sat4j.core.Vec;
-import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.ISolver;
-import org.sat4j.specs.IVec;
-import org.sat4j.specs.IVecInt;
-import org.sat4j.specs.TimeoutException;
-
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
- * SAT solver.
- * 
- * @author Johannes
- * @author Malek
- * @author Kevin
+ * Super class for all SAT solvers that execute their solver in a "single shot". That is, the underlying solver
+ * does not have an internal state and is re-created for each isSatisfiable() call.
+ *
+ * @author Adam
  */
-public class SatSolver {
-    
-    private @Nullable IVec<IVecInt> clauses;
+abstract class AbstractSingleShotSatSolver implements ISatSolver {
+
+    private int[][] clauses;
     
     private @Nullable Map<String, Integer> mapping;
     
@@ -36,7 +26,7 @@ public class SatSolver {
     /**
      * Creates a new and empty Sat solver.
      */
-    public SatSolver() {
+    public AbstractSingleShotSatSolver() {
     }
     
     
@@ -47,7 +37,7 @@ public class SatSolver {
      * 
      * @param cnf The base CNF.
      */
-    public SatSolver(@NonNull Cnf cnf) {
+    public AbstractSingleShotSatSolver(@NonNull Cnf cnf) {
         Map<String, Integer> mapping = getMapping(cnf);
         
         Integer maxMapping = 0;
@@ -57,60 +47,46 @@ public class SatSolver {
             }
         }
         
-        clauses = getClauses(cnf, mapping);
+        this.clauses = getClauses(cnf, mapping);
         
         this.mapping = mapping;
         this.maxMapping = maxMapping;
     }
     
     /**
-     * Uses a Cnf file and check if it is satisfiable.
+     * Checks if the given clauses are satisfiable.
      * 
-     * @param cnf
-     *            the CNF in intern format @see Cnf.
-     * @return true if satisfiable.
-     * @throws SolverException If the sat solver fails.
+     * @param numVars The number of variables used. I.e. this is the highest number in the clauses array.
+     * @param clauses A list (first dimension) of clauses with variables (second dimension). Negated values are
+     *      negative. The first variable is 1.
+     *      
+     * @return Whether this CNF is satisfiable.
+     * 
+     * @throws SolverException If solving this CNF fails.
      */
+    protected abstract boolean isSatisfiable(int numVars, int[][] clauses) throws SolverException; 
+    
+    @Override
     public boolean isSatisfiable(@NonNull Cnf cnf) throws SolverException {
         Map<String, Integer> numberVarMapping = getMapping(cnf);
 
-        boolean sat = false;
+        int[][] newClauses = getClauses(cnf, numberVarMapping);
         
-        try {
-            ISolver solver = createSolver();
-
-
-            IVec<IVecInt> clauses = getClauses(cnf, numberVarMapping);
-            
-            solver.addAllClauses(clauses);
-            
-            try {
-                sat = solver.isSatisfiable();
-            } catch (TimeoutException e) {
-                throw new SolverException(e);
+        if (this.clauses != null) {
+            int[][] tmp = new int[this.clauses.length + newClauses.length][];
+            System.arraycopy(this.clauses, 0, tmp, 0, this.clauses.length);
+            System.arraycopy(newClauses, 0, tmp, this.clauses.length, newClauses.length);
+            newClauses = tmp;
+        }
+        
+        int maxMapping = 0;
+        for (Integer entry : numberVarMapping.values()) {
+            if (entry > maxMapping) {
+                maxMapping = entry;
             }
-        } catch (ContradictionException e) {
-            // sat is already false
         }
         
-        return sat;
-    }
-    
-    /**
-     * Creates a new solver. If a pre-existing CNF was defined, then it is added to the solver.
-     * 
-     * @return The solver that can be used.
-     * @throws ContradictionException If the pre-existing CNF already has a contradiction.
-     */
-    private @NonNull ISolver createSolver() throws ContradictionException {
-        ISolver solver = SolverFactory.newDefault();
-        solver.setDBSimplificationAllowed(false);
-        
-        if (clauses != null) {
-            solver.addAllClauses(clauses);
-        }
-        
-        return solver;
+        return isSatisfiable(maxMapping, newClauses);
     }
     
     /**
@@ -147,9 +123,9 @@ public class SatSolver {
      * @param numberMapping The mapping from name to integer to use.
      * @return The clauses for the solver.
      */
-    private @NonNull IVec<IVecInt> getClauses(@NonNull Cnf cnf, @NonNull Map<String, Integer> numberMapping) {
+    private int[][] getClauses(@NonNull Cnf cnf, @NonNull Map<String, Integer> numberMapping) {
 
-        VecInt[] result = new VecInt[cnf.getRowCount()];
+        int[][] result = new int[cnf.getRowCount()][];
         
         for (int i = 0; i < cnf.getRowCount(); i++) {
             List<CnfVariable> variables = cnf.getRow(i);
@@ -162,10 +138,10 @@ public class SatSolver {
 
             }
             
-            result[i] = new VecInt(row);
+            result[i] = row;
         }
         
-        return new Vec<>(result);
+        return result;
     }
-    
+
 }

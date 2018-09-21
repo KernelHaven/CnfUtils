@@ -61,7 +61,7 @@ public abstract class AbstractCnfConverterTest {
         aB.addRow(new CnfVariable(false, "A"));
         aB.addRow(new CnfVariable(false, "B"));
         
-        SatSolver solver = new SatSolver();
+        ISatSolver solver = SatSolverFactory.createDefaultSolver();
         
         assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(true));
         assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(false));
@@ -104,7 +104,7 @@ public abstract class AbstractCnfConverterTest {
         aB.addRow(new CnfVariable(false, "A"));
         aB.addRow(new CnfVariable(false, "B"));
         
-        SatSolver solver = new SatSolver();
+        ISatSolver solver = SatSolverFactory.createDefaultSolver();
         
         assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(false));
         assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(true));
@@ -147,7 +147,7 @@ public abstract class AbstractCnfConverterTest {
         aB.addRow(new CnfVariable(false, "A"));
         aB.addRow(new CnfVariable(false, "B"));
         
-        SatSolver solver = new SatSolver();
+        ISatSolver solver = SatSolverFactory.createDefaultSolver();
         
         assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(false));
         assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(false));
@@ -178,7 +178,7 @@ public abstract class AbstractCnfConverterTest {
         Cnf notACnf = new Cnf();
         notACnf.addRow(new CnfVariable(true, "A"));
         
-        SatSolver solver = new SatSolver();
+        ISatSolver solver = SatSolverFactory.createDefaultSolver();
         
         assertThat(solver.isSatisfiable(cnf.combine(aCnf)), is(true));
         assertThat(solver.isSatisfiable(cnf.combine(notACnf)), is(false));
@@ -219,7 +219,7 @@ public abstract class AbstractCnfConverterTest {
         aB.addRow(new CnfVariable(false, "A"));
         aB.addRow(new CnfVariable(false, "B"));
         
-        SatSolver solver = new SatSolver();
+        ISatSolver solver = SatSolverFactory.createDefaultSolver();
         
         assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(true));
         assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(false));
@@ -262,7 +262,7 @@ public abstract class AbstractCnfConverterTest {
         aB.addRow(new CnfVariable(false, "A"));
         aB.addRow(new CnfVariable(false, "B"));
         
-        SatSolver solver = new SatSolver();
+        ISatSolver solver = SatSolverFactory.createDefaultSolver();
         
         assertThat(solver.isSatisfiable(cnf.combine(notAnotB)), is(true));
         assertThat(solver.isSatisfiable(cnf.combine(notAB)), is(true));

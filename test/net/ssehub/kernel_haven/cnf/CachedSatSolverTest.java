@@ -22,13 +22,13 @@ import net.ssehub.kernel_haven.variability_model.VariabilityModelDescriptor.Cons
 public class CachedSatSolverTest extends AbstractSatSolverTest {
 
     @Override
-    protected @NonNull SatSolver createSatSolver() {
-        return new CachedSatSolver();
+    protected @NonNull ISatSolver createSatSolver() {
+        return new CachedSatSolver(new Sat4jSolver());
     }
 
     @Override
-    protected @NonNull SatSolver createSatSolver(@NonNull Cnf cnf) {
-        return new CachedSatSolver(cnf);
+    protected @NonNull ISatSolver createSatSolver(@NonNull Cnf cnf) {
+        return new CachedSatSolver(new Sat4jSolver(cnf));
     }
     
     /**
@@ -44,8 +44,8 @@ public class CachedSatSolverTest extends AbstractSatSolverTest {
         vm.getDescriptor().setConstraintFileType(ConstraintFileType.DIMACS);
         Cnf huge = new VmToCnfConverter().convertVmToCnf(vm);
         
-        SatSolver normalSolver = new SatSolver(huge);
-        CachedSatSolver solver = new CachedSatSolver(huge);
+        Sat4jSolver normalSolver = new Sat4jSolver(huge);
+        CachedSatSolver solver = new CachedSatSolver(new Sat4jSolver(huge));
         
         CnfVariable var1 = new CnfVariable("VARIABLE_123");
         CnfVariable notVar2 = new CnfVariable(true, "VARIABLE_231");

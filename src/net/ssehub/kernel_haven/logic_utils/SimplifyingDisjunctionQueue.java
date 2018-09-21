@@ -8,7 +8,8 @@ import net.ssehub.kernel_haven.cnf.ConverterException;
 import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory;
 import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory.Strategy;
 import net.ssehub.kernel_haven.cnf.IFormulaToCnfConverter;
-import net.ssehub.kernel_haven.cnf.SatSolver;
+import net.ssehub.kernel_haven.cnf.ISatSolver;
+import net.ssehub.kernel_haven.cnf.SatSolverFactory;
 import net.ssehub.kernel_haven.cnf.SolverException;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
@@ -21,7 +22,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
- * A {@link DisjunctionQueue} that uses a {@link SatSolver} to keep resulting {@link Formula}s small.
+ * A {@link DisjunctionQueue} that uses an {@link ISatSolver} to keep resulting {@link Formula}s small.
  * 
  * @author Adam
  */
@@ -29,7 +30,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
 
     static final boolean USE_RECURSIVE_SPLIT = false; // when enabling, also comment code in checkRelevancy() back in
     
-    private @NonNull SatSolver solver;
+    private @NonNull ISatSolver solver;
     
     private @NonNull IFormulaToCnfConverter converter;
     
@@ -39,7 +40,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
     public SimplifyingDisjunctionQueue() {
         super(true);
         
-        solver = new SatSolver();
+        solver = SatSolverFactory.createDefaultSolver();
         converter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
 

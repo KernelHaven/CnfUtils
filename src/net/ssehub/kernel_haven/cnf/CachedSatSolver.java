@@ -10,60 +10,43 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  *
  * @author Adam
  */
-public class CachedSatSolver extends SatSolver {
+class CachedSatSolver implements ISatSolver {
 
     private int cacheSize;
     
     private @NonNull Map<Cnf, Boolean> cache;
     
-    /**
-     * Creates a new {@link CachedSatSolver} with unlimited cache size.
-     */
-    public CachedSatSolver() {
-        cache = new HashMap<>();
-    }
+    private @NonNull ISatSolver realSolver;
     
     /**
-     * Creates a new {@link CachedSatSolver} with the given base CNF (see {@link SatSolver#SatSolver(Cnf)} and unlimited
-     * cache.
+     * Creates a new {@link CachedSatSolver} with unlimited cache size.
      * 
-     * @param cnf The base CNF.
+     * @param realSolver The real solver to use.
      */
-    public CachedSatSolver(@NonNull Cnf cnf) {
-        super(cnf);
-        cache = new HashMap<>();
+    public CachedSatSolver(@NonNull ISatSolver realSolver) {
+        this.cache = new HashMap<>();
+        this.realSolver = realSolver;
     }
     
     /**
      * Creates a {@link CachedSatSolver} with limited cache size.
      * 
+     * @param realSolver The real solver to use.
      * @param cacheSize The maximum number of cache entries to store.
      */
-    public CachedSatSolver(int cacheSize) {
-        this();
+    public CachedSatSolver(@NonNull ISatSolver realSolver, int cacheSize) {
+        this(realSolver);
         this.cacheSize = cacheSize;
     }
     
 
-    /**
-     * Creates a new {@link CachedSatSolver} with the given base CNF (see {@link SatSolver#SatSolver(Cnf)} and limited
-     * cache size.
-     * 
-     * @param cnf The base CNF.
-     * @param cacheSize The maximum number of cache entries to store.
-     */
-    public CachedSatSolver(@NonNull Cnf cnf, int cacheSize) {
-        this(cnf);
-        this.cacheSize = cacheSize;
-    }
-    
     @Override
     public boolean isSatisfiable(@NonNull Cnf cnf) throws SolverException {
         
         Boolean result = cache.get(cnf);
         
         if (result == null) {
-            result = super.isSatisfiable(cnf);
+            result = realSolver.isSatisfiable(cnf);
             
             // TODO: maybe better remove older entries?
             if (cacheSize <= 0 || cache.size() < cacheSize) {

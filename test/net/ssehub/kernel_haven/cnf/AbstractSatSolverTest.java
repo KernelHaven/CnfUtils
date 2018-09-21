@@ -53,7 +53,7 @@ public abstract class AbstractSatSolverTest {
      * 
      * @return The SAT solver to test.
      */
-    protected abstract @NonNull SatSolver createSatSolver();
+    protected abstract @NonNull ISatSolver createSatSolver();
     
     /**
      * Creates a SAT solver for testing.
@@ -62,7 +62,7 @@ public abstract class AbstractSatSolverTest {
      * 
      * @return The SAT solver to test.
      */
-    protected abstract @NonNull SatSolver createSatSolver(@NonNull Cnf cnf);
+    protected abstract @NonNull ISatSolver createSatSolver(@NonNull Cnf cnf);
 
     /**
      * Test satisfiability. <b>not A or B</b>
@@ -129,7 +129,7 @@ public abstract class AbstractSatSolverTest {
         Cnf cnf1 = new Cnf();
         cnf1.addRow(a, notB);
         
-        SatSolver solver = createSatSolver(cnf1);
+        ISatSolver solver = createSatSolver(cnf1);
         Cnf cnf2 = new Cnf();
         
         // a | b | a || !b

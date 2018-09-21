@@ -8,7 +8,8 @@ import net.ssehub.kernel_haven.cnf.ConverterException;
 import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory;
 import net.ssehub.kernel_haven.cnf.FormulaToCnfConverterFactory.Strategy;
 import net.ssehub.kernel_haven.cnf.IFormulaToCnfConverter;
-import net.ssehub.kernel_haven.cnf.SatSolver;
+import net.ssehub.kernel_haven.cnf.ISatSolver;
+import net.ssehub.kernel_haven.cnf.SatSolverFactory;
 import net.ssehub.kernel_haven.cnf.SolverException;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
@@ -20,7 +21,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 public class FormulaEqualityChecker {
 
-    private SatSolver solver;
+    private ISatSolver solver;
     
     private IFormulaToCnfConverter cnfConverter;
 
@@ -28,7 +29,7 @@ public class FormulaEqualityChecker {
      * Creates an instance.
      */
     public FormulaEqualityChecker() {
-        this.solver = new SatSolver();
+        this.solver = SatSolverFactory.createDefaultSolver();
         this.cnfConverter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
     
