@@ -9,7 +9,7 @@ CPP_SOURCE = $(subst .,_,$(CLASS)).cpp
 JNI_LIB = ../res/net/ssehub/kernel_haven/cnf/cryptominisat5-jni.so
 
 $(JNI_LIB): $(JNI_HEADER) $(CPP_SOURCE)
-	g++ -shared -fPIC -std=c++11 -O2 -I ${JAVA_HOME}/include -I ${JAVA_HOME}/include/linux -I $(CMS_DIR)/include -o $@ $(CPP_SOURCE) $(CMS_DIR)/lib/libcryptominisat5.a
+	g++ -shared -fPIC -std=c++11 -O3 -I ${JAVA_HOME}/include -I ${JAVA_HOME}/include/linux -I $(CMS_DIR)/include -o $@ $(CPP_SOURCE) $(CMS_DIR)/lib/libcryptominisat5.a
 
 $(JNI_HEADER): $(JAVA_SOURCE)
 	javah -classpath $(CLASS_DIR) $(CLASS)
