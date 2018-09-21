@@ -4,7 +4,7 @@
 
 A utility plugin for [KernelHaven](https://github.com/KernelHaven/KernelHaven).
 
-Utilities for Boolean formulas, including CNF converters and a SAT solver (based on [Sat4j v2.3.4](https://www.sat4j.org/)).
+Utilities for Boolean formulas, including CNF converters and a SAT solvers (based on [Sat4j v2.3.4](https://www.sat4j.org/) and [CryptoMiniSat 5.6.5](https://github.com/msoos/cryptominisat)).
 
 ## Usage
 
