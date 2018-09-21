@@ -21,6 +21,15 @@ public class SolverException extends Exception {
     /**
      * Creates a new {@link SolverException}.
      * 
+     * @param message The message of this message.
+     */
+    public SolverException(String message) {
+        super(message);
+    }
+    
+    /**
+     * Creates a new {@link SolverException}.
+     * 
      * @param cause The cause that caused this exception.
      */
     public SolverException(@Nullable Throwable cause) {

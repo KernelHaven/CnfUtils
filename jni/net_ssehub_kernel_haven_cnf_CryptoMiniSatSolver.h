@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     net_ssehub_kernel_haven_cnf_CryptoMiniSatSolver
  * Method:    isSatisfiableImpl
- * Signature: (I[[I)Z
+ * Signature: (IILjava/nio/IntBuffer;)Z
  */
 JNIEXPORT jboolean JNICALL Java_net_ssehub_kernel_1haven_cnf_CryptoMiniSatSolver_isSatisfiableImpl
-  (JNIEnv *, jclass, jint, jobjectArray);
+  (JNIEnv *, jclass, jint, jint, jobject);
 
 #ifdef __cplusplus
 }
