@@ -15,7 +15,7 @@ JNIEXPORT jboolean JNICALL Java_net_ssehub_kernel_1haven_cnf_CryptoMiniSatSolver
 	for (int i = 0; i < length; i++) {
 		jintArray line = (jintArray) env->GetObjectArrayElement(clauses, i);
 		jsize lineLength = env->GetArrayLength(line);
-		jint *lineElements = env->GetIntArrayElements(line, 0);
+		jint *lineElements = env->GetIntArrayElements(line, nullptr);
 
 		std::vector<CMSat::Lit> clause;
 
@@ -30,6 +30,8 @@ JNIEXPORT jboolean JNICALL Java_net_ssehub_kernel_1haven_cnf_CryptoMiniSatSolver
 
 			clause.push_back(CMSat::Lit(element - 1, negated));
 		}
+
+		env->ReleaseIntArrayElements(line, lineElements, JNI_ABORT);
 
 		solver.add_clause(clause);
 	}
