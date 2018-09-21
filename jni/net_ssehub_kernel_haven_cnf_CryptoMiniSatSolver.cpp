@@ -6,9 +6,9 @@
 JNIEXPORT jboolean JNICALL Java_net_ssehub_kernel_1haven_cnf_CryptoMiniSatSolver_isSatisfiableImpl(
 		JNIEnv *env, jclass clazz, jint numVars, jobjectArray clauses) {
 
-	CMSat::SATSolver *solver = new CMSat::SATSolver();
+	CMSat::SATSolver solver;
 
-	solver->new_vars(numVars);
+	solver.new_vars(numVars);
 
 	jsize length = env->GetArrayLength(clauses);
 
@@ -31,9 +31,9 @@ JNIEXPORT jboolean JNICALL Java_net_ssehub_kernel_1haven_cnf_CryptoMiniSatSolver
 			clause.push_back(CMSat::Lit(element - 1, negated));
 		}
 
-		solver->add_clause(clause);
+		solver.add_clause(clause);
 	}
 
-	CMSat::lbool result = solver->solve();
+	CMSat::lbool result = solver.solve();
 	return result == CMSat::l_True ? true : false;
 }
