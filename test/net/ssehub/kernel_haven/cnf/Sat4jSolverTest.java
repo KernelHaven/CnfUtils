@@ -7,7 +7,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  *
  * @author Adam
  */
-public class SatSolverTest extends AbstractSatSolverTest {
+public class Sat4jSolverTest extends AbstractSatSolverTest {
 
     @Override
     protected @NonNull ISatSolver createSatSolver() {

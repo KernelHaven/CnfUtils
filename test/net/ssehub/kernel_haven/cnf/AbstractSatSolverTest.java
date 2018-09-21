@@ -10,12 +10,12 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
 /**
  * The SatSolverTest tests if the sat4j library is correct used. Therefore this
  * class tests whether a CNF is satisfiable
- * {@link SatSolverTest#testSatisfiability()} and if it is not satisfiable
- * {@link SatSolverTest#testNotSatisfiability()}. Furthermore it tests if a CNF
+ * {@link Sat4jSolverTest#testSatisfiability()} and if it is not satisfiable
+ * {@link Sat4jSolverTest#testNotSatisfiability()}. Furthermore it tests if a CNF
  * can be satisfiable and then after adding a new CNF is still satisfiable
- * {@link SatSolverTest#testCascadingSatisfiability()}. The other way around it
+ * {@link Sat4jSolverTest#testCascadingSatisfiability()}. The other way around it
  * tests if a CNF is satisfiable and after adding a new CNF is not satisfiable
- * anymore. {@link SatSolverTest#testCascadingNotSatisfiability()}.
+ * anymore. {@link Sat4jSolverTest#testCascadingNotSatisfiability()}.
  * 
  * @author Kevin
  * @author Johannes

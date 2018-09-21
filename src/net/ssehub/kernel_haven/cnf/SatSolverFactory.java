@@ -94,6 +94,14 @@ public class SatSolverFactory {
             }
             break;
             
+        case CRYPTOMINISAT:
+            if (cnf != null) {
+                result = new CryptoMiniSatSolver(cnf);
+            } else {
+                result = new CryptoMiniSatSolver();
+            }
+            break;
+            
         default:
             throw new SetUpException("Unsupported type of solver: " + type);
         }

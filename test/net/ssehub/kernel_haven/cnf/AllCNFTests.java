@@ -10,7 +10,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     VmToCnfConverterTest.class,
-    SatSolverTest.class,
+    Sat4jSolverTest.class,
+    CryptoMiniSatSolverTest.class,
     CnfTest.class,
     RecursiveCnfConverterTest.class,
     RecursiveReplacingCnfConverterTest.class,

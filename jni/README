@@ -1,0 +1,21 @@
+Building the JNI library for CryptoMiniSat
+==========================================
+
+(This is my first time using JNI, so please be gentle)
+
+This README explains how I built the CryptoMiniSat (CMS) JNI library.
+
+The Makefile in this directory builds everything that is needed. These are the two steps:
+
+1) The header file with the correct JNI functions is generated from the Java source file using the javah tool.
+2) The implementation (*.cpp) of the JNI is compiled with the generated header and the CMS library to create the final
+   shared object (cryptominisat5-jni.so) in the res/ folder.
+
+The first few lines in the Makefile contain variables that you probably want to adapt:
+- JAVA_HOME should point to the Java installation directory. Inside of this there should be `include/jni.h` and
+  `include/linux/`.
+- CMS_DIR should point to the build directory of CryptoMiniSat. Inside of this there should be `include/cryptominisat/`
+  and `lib/libcryptominisat5.a`.
+
+The cryptominisat5-jni.so in the res/ folder is packaged into the delivered Jar, and CryptoMiniSatSolver.init() loads
+it on-demand into the JVM.
