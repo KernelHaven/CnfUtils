@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.cnf;
 
+import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,6 +11,7 @@ import java.nio.IntBuffer;
 import net.ssehub.kernel_haven.SetUpException;
 import net.ssehub.kernel_haven.util.Util;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
+import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * SAT solver based on <a href="https://github.com/msoos/cryptominisat">CryptoMiniSat</a>. This currently runs only on
@@ -18,7 +21,12 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
 
+    /**
+     * Whether we have loaded the native library yet.
+     */
     private static boolean initiailized = false;
+    
+    private @Nullable IntBuffer directBuffer;
     
     /**
      * Creates a new and empty Sat solver.
@@ -78,6 +86,40 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
      */
     private static native boolean isSatisfiableImpl(int numVars, int numClauses, IntBuffer buffer);
     
+    /**
+     * Returns a direct {@link IntBuffer} with at least the specified capacity. If applicable, old buffers are re-used
+     * so that we don't have to allocate new buffers all the time.
+     * 
+     * @param requiredCapacity The number of ints that need to be stored.
+     * 
+     * @return An {@link IntBuffer} with at least the specified capacity.
+     * 
+     * @throws SolverException If no direct buffer can be created.
+     */
+    private @NonNull IntBuffer getDirectBuffer(int requiredCapacity) throws SolverException {
+        IntBuffer result;
+        
+        IntBuffer previousBuffer = this.directBuffer;
+        if (previousBuffer != null && previousBuffer.capacity() >= requiredCapacity) {
+            // re-use old buffer, since its large enough
+            previousBuffer.clear(); // make sure it's empty
+            result = previousBuffer;
+            
+        } else {
+            result = notNull(
+                    ByteBuffer.allocateDirect(requiredCapacity * 4).order(ByteOrder.nativeOrder()).asIntBuffer());
+            
+            if (!result.isDirect()) {
+                throw new SolverException("Unable to create direct IntBuffer");
+            }
+        }
+        
+        // store for future use
+        this.directBuffer = result;
+        
+        return result;
+    }
+    
     @Override
     protected boolean isSatisfiable(int numVars, int[][] clauses) throws SolverException {
         // store the clauses as a flat list in an IntBuffer, so that JNI can directly access the memory
@@ -88,11 +130,7 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
             capacity += clause.length + 1;
         }
         
-        IntBuffer buffer = ByteBuffer.allocateDirect(capacity * 4).order(ByteOrder.nativeOrder()).asIntBuffer();
-        
-        if (!buffer.isDirect()) {
-            throw new SolverException("Unable to create direct IntBuffer");
-        }
+        IntBuffer buffer = getDirectBuffer(capacity);
         
         for (int[] clause : clauses) {
             buffer.put(clause.length);
