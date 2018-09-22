@@ -76,15 +76,18 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
     /**
      * The native implementation that calls the CMS solver.
      * 
-     * @param numVars The number of the highest variable used.
-     * @param numClauses The number of clauses in the buffer.
-     * @param buffer A flat buffer of all the CNF clauses to add. The first element is the length of the first clause,
-     *      followed by this many clause elements. After this comes the length of the second clause, etc. Clause
+     * @param numVars The number of the highest variable used. Must be > 0.
+     * @param numClauses The number of clauses in the buffer. Must be > 0.
+     * @param intBuffer A flat buffer of all the CNF clauses to add. The first element is the length of the first
+     *      clause, followed by this many clause elements. After this comes the length of the second clause, etc. Clause
      *      elements are integers representing variables, while negative values are negated (just like CNF). 
      * 
      * @return Whether the CNF is satisfiable or not.
+     * 
+     * @throws SolverException If JNI communication fails or the CMS solver throws an exception.
      */
-    private static native boolean isSatisfiableImpl(int numVars, int numClauses, IntBuffer buffer);
+    private static native boolean isSatisfiableImpl(int numVars, int numClauses, @NonNull IntBuffer intBuffer)
+            throws SolverException;
     
     /**
      * Returns a direct {@link IntBuffer} with at least the specified capacity. If applicable, old buffers are re-used
