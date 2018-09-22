@@ -1,0 +1,7 @@
+{
+	global:
+		Java_net_ssehub_kernel_1haven_cnf_CryptoMiniSatSolver_isSatisfiableImpl;
+
+	local:
+		*;
+};
