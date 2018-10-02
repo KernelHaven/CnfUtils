@@ -40,7 +40,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
     public SimplifyingDisjunctionQueue() {
         super(true);
         
-        solver = SatSolverFactory.createDefaultSolver();
+        solver = SatSolverFactory.createSolver();
         converter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
 

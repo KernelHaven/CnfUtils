@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 
-import net.ssehub.kernel_haven.SetUpException;
 import net.ssehub.kernel_haven.util.Util;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
@@ -31,9 +30,9 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
     /**
      * Creates a new and empty Sat solver.
      * 
-     * @throws SetUpException If loading the JNI library fails.
+     * @throws UnsupportedOperationException If loading the JNI library fails.
      */
-    public CryptoMiniSatSolver() throws SetUpException {
+    public CryptoMiniSatSolver() {
         init();
     }
     
@@ -45,9 +44,9 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
      * 
      * @param cnf The base CNF.
      * 
-     * @throws SetUpException If loading the JNI library fails.
+     * @throws UnsupportedOperationException If loading the JNI library fails.
      */
-    public CryptoMiniSatSolver(@NonNull Cnf cnf) throws SetUpException {
+    public CryptoMiniSatSolver(@NonNull Cnf cnf) throws UnsupportedOperationException {
         super(cnf);
         init();
     }
@@ -55,9 +54,9 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
     /**
      * Loads the JNI library.
      * 
-     * @throws SetUpException If loading fails.
+     * @throws UnsupportedOperationException If loading fails.
      */
-    private static synchronized void init() throws SetUpException {
+    private static synchronized void init() throws UnsupportedOperationException {
         if (!initiailized) {
             
             try {
@@ -66,7 +65,7 @@ class CryptoMiniSatSolver extends AbstractSingleShotSatSolver {
                 System.load(library.getAbsolutePath());
                 
             } catch (IOException | SecurityException | UnsatisfiedLinkError e) {
-                throw new SetUpException("Can't load JNI library", e);
+                throw new UnsupportedOperationException("Can't load JNI library", e);
             }
             
             initiailized = true;

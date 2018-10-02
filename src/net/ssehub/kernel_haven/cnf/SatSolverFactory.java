@@ -16,6 +16,8 @@ public class SatSolverFactory {
     public static final @NonNull EnumSetting<@NonNull SolverType> SOLVER_SETTING
         = new EnumSetting<>("cnf.solver", SolverType.class, true, SolverType.SAT4J, "Defines which SAT solver to use.");
     
+    private static @NonNull SolverType configuredType = SolverType.SAT4J;
+    
     /**
      * Enumeration of all supported Sat solvers.
      */
@@ -35,23 +37,29 @@ public class SatSolverFactory {
     }
     
     /**
-     * Creates a default SAT solver. Currently, this is Sat4j. This is equal to createSolver(null, null, null, false).
+     * Initialization method called by KernelHaven. See loadClasses.txt
+     * 
+     * @param config The global pipeline configuration.
+     * 
+     * @throws SetUpException If the configuration is not valid.
+     */
+    public static void initialize(@NonNull Configuration config) throws SetUpException {
+        config.registerSetting(SOLVER_SETTING);
+        configuredType = config.getValue(SOLVER_SETTING);
+    }
+    
+    /**
+     * Creates a SAT solver as specified in the configuration. By default, is Sat4j (unless configured otherwise).
      * 
      * @return The solver.
      */
-    public static @NonNull ISatSolver createDefaultSolver() {
-        try {
-            return createSolver(null, null, null, false);
-        } catch (SetUpException e) {
-            // can't happen.
-            throw new RuntimeException(e);
-        }
+    public static @NonNull ISatSolver createSolver() {
+        return createSolver(configuredType, null, false);
     }
     
     /**
      * <p>
-     * Creates a SAT solver with the given configuration or parameter. The type parameter takes precedence over the
-     * configuration. All parameters are optional (all may be <code>null</code>).
+     * Creates a SAT solver as specified in the configuration. By default, is Sat4j (unless configured otherwise).
      * </p>
      * <p>
      * Optionally a base CNF can be passed to this call. This CNF will be used as a basis for each successive call
@@ -59,28 +67,43 @@ public class SatSolverFactory {
      * of other CNFs.
      * </p>
      * 
-     * @param config The configuration to read the solver type from. If this is <code>null</code>, then a Sat4j solver
-     *      will be created.
-     * @param type If not <code>null</code>, then a solver of this type will be created (overwrites the config).
+     * @param cnf The base CNF. Leave this as <code>null</code> if no base CNF is wanted.
+     * @param cached Whether to wrap a cache around this solver. If unsure, say <code>false</code> here.
+     * 
+     * @return The solver.
+     */
+    public static @NonNull ISatSolver createSolver(@Nullable Cnf cnf, boolean cached) {
+        return createSolver(configuredType, cnf, cached);
+    }
+    
+    /**
+     * Creates a SAT solver instance with the given type.
+     * 
+     * @param type The type of solver to create.
+     * 
+     * @return An instance of the given solver.
+     */
+    public static @NonNull ISatSolver createSolver(@NonNull SolverType type) {
+        return createSolver(type, null, false);
+    }
+    
+    /**
+     * <p>
+     * Creates a SAT solver instance with the given type.
+     * </p>
+     * <p>
+     * Optionally a base CNF can be passed to this call. This CNF will be used as a basis for each successive call
+     * to isSatisfiable(). This version is more performant if the same CNF is checked against a lot
+     * of other CNFs.
+     * </p>
+     * 
+     * @param type The type of solver to create.
      * @param cnf The base CNF. Leave this as <code>null</code> if no base CNF is wanted.
      * @param cached Whether to wrap a cache around this solver. If unsure, say <code>false</code> here.
      * 
      * @return An instance of the given solver.
-     * 
-     * @throws SetUpException If creating the solver fails.
      */
-    public static @NonNull ISatSolver createSolver(@Nullable Configuration config, @Nullable SolverType type,
-            @Nullable Cnf cnf, boolean cached)
-            throws SetUpException {
-        
-        if (type == null) {
-            if (config != null) {
-                config.registerSetting(SOLVER_SETTING);
-                type = config.getValue(SOLVER_SETTING);
-            } else {
-                type = SolverType.SAT4J;
-            }
-        }
+    public static @NonNull ISatSolver createSolver(@NonNull SolverType type, @Nullable Cnf cnf, boolean cached) {
         
         ISatSolver result;
         
@@ -103,7 +126,8 @@ public class SatSolverFactory {
             break;
             
         default:
-            throw new SetUpException("Unsupported type of solver: " + type);
+            // shouldn't happen
+            throw new RuntimeException("Unsupported type of solver: " + type);
         }
         
         if (cached) {

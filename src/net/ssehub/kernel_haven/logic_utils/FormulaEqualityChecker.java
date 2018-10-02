@@ -29,7 +29,7 @@ public class FormulaEqualityChecker {
      * Creates an instance.
      */
     public FormulaEqualityChecker() {
-        this.solver = SatSolverFactory.createDefaultSolver();
+        this.solver = SatSolverFactory.createSolver();
         this.cnfConverter = FormulaToCnfConverterFactory.create(Strategy.RECURISVE_REPLACING);
     }
     
