@@ -5,6 +5,7 @@ import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
+import net.ssehub.kernel_haven.config.Configuration;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.logic.Formula;
@@ -76,8 +77,10 @@ public class LogicUtils {
     
     /**
      * Initialization method called by KernelHaven. See loadClasses.txt
+     * 
+     * @param config The global pipeline configuration.
      */
-    public static void initialize() {
+    public static void initialize(@NonNull Configuration config) {
 //        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
         FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithVisitor);
     }
