@@ -3,6 +3,7 @@ package net.ssehub.kernel_haven.cnf;
 import net.ssehub.kernel_haven.SetUpException;
 import net.ssehub.kernel_haven.config.Configuration;
 import net.ssehub.kernel_haven.config.EnumSetting;
+import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
@@ -106,6 +107,8 @@ public class SatSolverFactory {
     public static @NonNull ISatSolver createSolver(@NonNull SolverType type, @Nullable Cnf cnf, boolean cached) {
         
         ISatSolver result;
+        
+        Logger.get().logDebug2("Creating SAT solver of type ", type);
         
         switch (type) {
         
