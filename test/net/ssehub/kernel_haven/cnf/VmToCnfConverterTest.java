@@ -164,8 +164,6 @@ public class VmToCnfConverterTest {
         Set<VariabilityVariable> set = new HashSet<>();
         set.add(new VariabilityVariable("A", "tristate", 1) {
             
-            private static final long serialVersionUID = -8972262722318987171L;
-
             @Override
             public void getDimacsMapping(Map<Integer, String> mapping) {
                 mapping.put(getDimacsNumber(), getName());
