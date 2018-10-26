@@ -37,7 +37,7 @@ public class LogicUtils {
      * @see <a href="https://github.com/bpodgursky/jbool_expressions">
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
-    public static @NonNull Formula simplify(@NonNull Formula formula) {
+    public static @NonNull Formula simplifyWithLibrary(@NonNull Formula formula) {
         FormulaToExpressionConverter converter = new FormulaToExpressionConverter();
         Expression<String> expr = converter.visit(formula);
         Expression<String> translated = notNull(RuleSet.simplify(expr));
@@ -71,7 +71,7 @@ public class LogicUtils {
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
-        Formula firstSimplification = simplify(formula);
+        Formula firstSimplification = simplifyWithLibrary(formula);
         return firstSimplification.accept(new FormulaSimplificationVisitor());
     }
     

@@ -26,7 +26,7 @@ public class LogicUtilsTest {
     @Test
     public void testNoSimplificationAND() {
         Formula complicated = and("A", "B");
-        Formula simplified = LogicUtils.simplify(complicated);
+        Formula simplified = LogicUtils.simplifyWithLibrary(complicated);
         
         Assert.assertEquals(complicated, simplified);
     }
@@ -37,7 +37,7 @@ public class LogicUtilsTest {
     @Test
     public void testNoSimplificationOR() {
         Formula complicated = or("A", "B");
-        Formula simplified = LogicUtils.simplify(complicated);
+        Formula simplified = LogicUtils.simplifyWithLibrary(complicated);
         
         Assert.assertEquals(complicated, simplified);
     }
@@ -49,7 +49,7 @@ public class LogicUtilsTest {
     public void testORSimplification() {
         Variable varA = new Variable("A");
         Formula complicated = or("A", "A");
-        Formula simplified = LogicUtils.simplify(complicated);
+        Formula simplified = LogicUtils.simplifyWithLibrary(complicated);
         
         Assert.assertEquals(varA, simplified);
     }
@@ -61,7 +61,7 @@ public class LogicUtilsTest {
     public void testANDSimplification() {
         Variable varA = new Variable("A");
         Formula complicated = and("A", "A");
-        Formula simplified = LogicUtils.simplify(complicated);
+        Formula simplified = LogicUtils.simplifyWithLibrary(complicated);
         
         Assert.assertEquals(varA, simplified);
     }
@@ -73,7 +73,7 @@ public class LogicUtilsTest {
     public void testDoubleNotSimplification() {
         Variable varA = new Variable("A");
         Formula complicated = not(not("A"));
-        Formula simplified = LogicUtils.simplify(complicated);
+        Formula simplified = LogicUtils.simplifyWithLibrary(complicated);
         
         Assert.assertEquals(varA, simplified);
     }
@@ -87,7 +87,7 @@ public class LogicUtilsTest {
         Formula middlePart = and("C", or("D", "E"));
         
         Formula complicated = or("A", or(middlePart, and("A", "B")));
-        Formula simplified = LogicUtils.simplify(complicated);
+        Formula simplified = LogicUtils.simplifyWithLibrary(complicated);
         
         assertEquals(or("A", middlePart), simplified);
     }
