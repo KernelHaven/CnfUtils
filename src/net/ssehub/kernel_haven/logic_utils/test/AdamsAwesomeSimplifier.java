@@ -5,6 +5,7 @@ import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.or;
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
@@ -94,13 +95,14 @@ public class AdamsAwesomeSimplifier {
      * @return The formula with moved negations.
      */
     private static @NonNull Formula moveNegationOutwards(@NonNull Formula formula) {
-        
         Formula result;
         
         if (formula instanceof Disjunction) {
             Disjunction dis = (Disjunction) formula;
-            
-            List<@NonNull Formula> allTerms = FormulaStructureChecker.getAllDisjunctionTerms(dis);
+            List<@NonNull Formula> allTerms = new LinkedList<>();
+            FormulaStructureChecker.getAllDisjunctionTerms(dis).stream()
+                    .map((term) -> moveNegationOutwards(term))
+                    .forEach(allTerms::add);
             
             boolean allNegated = true;
             for (Formula f : allTerms) {
@@ -118,13 +120,18 @@ public class AdamsAwesomeSimplifier {
                 result = new Negation(result);
                 
             } else {
-                result = new Disjunction(moveNegationOutwards(dis.getLeft()), moveNegationOutwards(dis.getRight()));
+                result = notNull(allTerms.remove(0));
+                for (Formula term : allTerms) {
+                    result = or(result, term);
+                }
             }
             
         } else if (formula instanceof Conjunction) {
             Conjunction con = (Conjunction) formula;
-            
-            List<@NonNull Formula> allTerms = FormulaStructureChecker.getAllConjunctionTerms(con);
+            List<@NonNull Formula> allTerms = new LinkedList<>();
+            FormulaStructureChecker.getAllConjunctionTerms(con).stream()
+                    .map((term) -> moveNegationOutwards(term))
+                    .forEach(allTerms::add);
             
             boolean allNegated = true;
             for (Formula f : allTerms) {
@@ -142,7 +149,10 @@ public class AdamsAwesomeSimplifier {
                 result = new Negation(result);
                 
             } else {
-                result = new Conjunction(moveNegationOutwards(con.getLeft()), moveNegationOutwards(con.getRight()));
+                result = notNull(allTerms.remove(0));
+                for (Formula term : allTerms) {
+                    result = and(result, term);
+                }
             }
             
         } else if (formula instanceof Negation) {
