@@ -5,7 +5,10 @@ import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
+import net.ssehub.kernel_haven.SetUpException;
 import net.ssehub.kernel_haven.config.Configuration;
+import net.ssehub.kernel_haven.config.EnumSetting;
+import net.ssehub.kernel_haven.logic_utils.test.AdamsAwesomeSimplifier;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.logic.Formula;
@@ -20,7 +23,43 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 public class LogicUtils {
 
+    /**
+     * A setting to define which simplification to use.
+     */
+    public static final @NonNull EnumSetting<@NonNull Simplification> SIMPLIFICATION_SETTING
+            = new EnumSetting<>("logic.simplifier", Simplification.class, true, Simplification.VISITOR,
+            "Specifies which heuristic to use to simplify Boolean expressions.");
+    
+    /**
+     * Different simplification strategies to use.
+     */
+    public static enum Simplification {
+        
+        /**
+         * Only use the default simplification of the main infrastructure. Basically only prunes constants.
+         */
+        SIMPLE,
+        
+        /**
+         * Use the <a href="https://github.com/bpodgursky/jbool_expressions">jbool_expressions</a> library.
+         */
+        LIBRARY,
+        
+        /**
+         * Use the <a href="https://github.com/bpodgursky/jbool_expressions">jbool_expressions</a> and
+         * {@link FormulaSimplificationVisitor}.
+         */
+        VISITOR,
+        
+        /**
+         * Use {@link AdamsAwesomeSimplifier} (utilizes all of the above).
+         */
+        ADAMS_AWESOME_SIMPLIFIER;
+        
+    }
+    
     private static final Logger LOGGER = Logger.get();
+    
     
     /**
      * Don't allow instances.
@@ -79,10 +118,32 @@ public class LogicUtils {
      * Initialization method called by KernelHaven. See loadClasses.txt
      * 
      * @param config The global pipeline configuration.
+     * 
+     * @throws SetUpException If the {@link Configuration} doesn't contain a valid setting for the simplification.
      */
-    public static void initialize(@NonNull Configuration config) {
-//        FormulaSimplifier.setSimplifier(LogicUtils::simplify);
-        FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithVisitor);
+    public static void initialize(@NonNull Configuration config) throws SetUpException {
+        config.registerSetting(SIMPLIFICATION_SETTING);
+        
+        switch (config.getValue(SIMPLIFICATION_SETTING)) {
+        case SIMPLE:
+            // do nothing; stay with default simplifier from the infrastructure
+            break;
+            
+        case LIBRARY:
+            FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithLibrary);
+            break;
+            
+        case VISITOR:
+            FormulaSimplifier.setSimplifier(LogicUtils::simplifyWithVisitor);
+            break;
+            
+        case ADAMS_AWESOME_SIMPLIFIER:
+            FormulaSimplifier.setSimplifier(AdamsAwesomeSimplifier::simplify);
+            break;
+        
+        default:
+            throw new SetUpException("Unexpected simplification type: " + config.getValue(SIMPLIFICATION_SETTING));
+        }
     }
     
 }
