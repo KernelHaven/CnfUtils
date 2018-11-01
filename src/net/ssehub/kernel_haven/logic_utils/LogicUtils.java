@@ -111,12 +111,12 @@ public class LogicUtils {
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
         PerformanceProbe p;
         
-        p = new PerformanceProbe("VisitorSimplifier 1) Visitor");
-        formula = formula.accept(new FormulaSimplificationVisitor2());
+        p = new PerformanceProbe("VisitorSimplifier 1) Library");
+        formula = simplifyWithLibrary(formula);
         p.close();
         
-        p = new PerformanceProbe("VisitorSimplifier 2) Library");
-        formula = simplifyWithLibrary(formula);
+        p = new PerformanceProbe("VisitorSimplifier 2) Visitor");
+        formula = formula.accept(new FormulaSimplificationVisitor2());
         p.close();
         
         return formula;
