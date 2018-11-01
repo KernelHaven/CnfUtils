@@ -58,7 +58,8 @@ public class FormulaSimplificationVisitor2Test {
         Variable varA = new Variable("A");
         return Arrays.asList(new Object[][] {
             // Conjunctions
-            {and("A", "B"), and("A", "B"), "AND"},
+            {and("A", "B"), and("A", "B"), "\u2227"},
+            {and(True.INSTANCE, True.INSTANCE), True.INSTANCE, "All True \u2227"},
             {and("A", "A"), varA, "Idempotence \u2227"},
             {and("A", True.INSTANCE), varA, "Identity \u2227"},
             {and(True.INSTANCE, "A"), varA, "Identity \u2227"},
@@ -74,11 +75,16 @@ public class FormulaSimplificationVisitor2Test {
 //            {and(not(and("A", "B")), not("A")), not("A"), "Negated Absorption \u2227"},
             {and(not(not("A")), "B"), and("A", "B"), "Rewrite Simplified \u2227"},
             {and("B", not(not("A"))), and("B", "A"), "Rewrite Simplified \u2227"},
-//            {and(not("A"), not(and(not("A"), "B"))), and(not("A"), not("B")), "Negation/Complement/Identity \u2227"},
-//            {and(not(and(not("A"), "B")), not("A")), and(not("A"), not("B")), "Negation/Complement/Identity \u2227"},
+            {and(not("A"), not(and(not("A"), "B"))), and(not("A"), not("B")), "Negation/Complement/Identity \u2227"},
+            {and(not(and(not("A"), "B")), not("A")), and(not("B"), not("A")), "Negation/Complement/Identity \u2227"},
+            
+            {and(not("A"), not(and(not("C"), "B"))), and(not("A"), not(and(not("C"), "B"))), "No Rule Applies \u2227"},
+            {and(not(and(not("C"), "B")), not("A")), and(not(and(not("C"), "B")), not("A")), "No Rule Applies \u2227"},
+            {and(not(or(not("A"), "B")), not("A")), and(not(or(not("A"), "B")), not("A")), "No Rule Applies \u2227"},
             
             // Disjunctions
-            {or("A", "B"), or("A", "B"), "OR"},
+            {or("A", "B"), or("A", "B"), "\u2228"},
+            {or(False.INSTANCE, False.INSTANCE), False.INSTANCE, "All False \u2228"},
             {or("A", "A"), varA, "Idempotence \u2228"},
             {or("A", False.INSTANCE), varA, "Identity \u2228"},
             {or(False.INSTANCE, "A"), varA, "Identity \u2228"},
@@ -95,7 +101,11 @@ public class FormulaSimplificationVisitor2Test {
             {or(not(not("A")), "B"), or("A", "B"), "Rewrite Simplified \u2228"},
             {or("B", not(not("A"))), or("B", "A"), "Rewrite Simplified \u2228"},
             {or(not("A"), not(or(not("A"), "B"))), or(not("A"), not("B")), "Negation/Complement/Identity \u2228"},
-//            {or(not(or(not("A"), "B")), not("A")), or(not("A"), not("B")), "Negation/Complement/Identity \u2228"},
+            {or(not(or(not("A"), "B")), not("A")), or(not("B"), not("A")), "Negation/Complement/Identity \u2228"},
+            
+            {or(not("A"), not(or(not("C"), "B"))), or(not("A"), not(or(not("C"), "B"))), "No Rule Applies \u2228"},
+            {or(not(or(not("C"), "B")), not("A")), or(not(or(not("C"), "B")), not("A")), "No Rule Applies \u2228"},
+            {or(not(and(not("C"), "B")), not("A")), or(not(and(not("C"), "B")), not("A")), "No Rule Applies \u2228"},
             
             // Negations
             {not("A"), not("A"), "Negation"},

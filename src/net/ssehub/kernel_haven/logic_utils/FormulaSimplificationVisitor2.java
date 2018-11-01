@@ -95,7 +95,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                         terms.add(term);
                     }
                 });
-
+        
         if (containsTrue.get()) {
             return True.INSTANCE;
         }
@@ -139,7 +139,6 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                     Formula nestedLeft = ((Negation) left).getFormula();
                     Formula nestedRight = ((Negation) right).getFormula();
                     
-                    // Test for (negated) Absorption
                     if (nestedLeft instanceof Variable && nestedRight instanceof Disjunction) {
                         // Check for combination of complementation, De Morgan, Identity
                         Formula tmp = negatedOrComplementation((Negation) left, (Disjunction) nestedRight);
@@ -236,7 +235,6 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                     Formula nestedLeft = ((Negation) left).getFormula();
                     Formula nestedRight = ((Negation) right).getFormula();
                     
-                    // Test for (negated) Absorption
                     if (nestedLeft instanceof Variable && nestedRight instanceof Conjunction) {
                         // Check for combination of complementation, De Morgan, Identity
                         Formula tmp = negatedAndComplementation((Negation) left, (Conjunction) nestedRight);
@@ -283,7 +281,8 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
      *
      * @param negatedVar The negated variable (<tt>!A</tt> in the example).
      * @param negatedConjunction The conjunction to test (<tt>!(!A &and; B)</tt> in the example).
-     * @return A simplified formula or <tt>null</tt> if the case could not be found.
+     * 
+     * @return The term that replaces the {@link Conjunction} (!B in the example).
      */
     private Formula negatedAndComplementation(@NonNull Negation negatedVar, @NonNull Conjunction negatedConjunction) {
         
@@ -294,11 +293,11 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         if (negatedVar.equals(innerLeft)) {
             Formula right = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
                 : new Negation(innerRight);
-            result = new Conjunction(negatedVar, right);
+            result = right;
         } else if (negatedVar.equals(innerRight)) {
             Formula right = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
                     : new Negation(innerLeft);
-            result = new Conjunction(negatedVar, right);
+            result = right;
         }
         
         if (null != result) {
