@@ -11,6 +11,7 @@ import net.ssehub.kernel_haven.config.EnumSetting;
 import net.ssehub.kernel_haven.logic_utils.test.AdamsAwesomeSimplifier;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
+import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.FormulaSimplifier;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
@@ -110,8 +111,15 @@ public class LogicUtils {
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
+        PerformanceProbe p = new PerformanceProbe("VisitorSimplifier 1) Library");
         Formula firstSimplification = simplifyWithLibrary(formula);
-        return firstSimplification.accept(new FormulaSimplificationVisitor());
+        p.close();
+        
+        p = new PerformanceProbe("VisitorSimplifier 2) Visitor");
+        Formula result = firstSimplification.accept(new FormulaSimplificationVisitor());
+        p.close();
+        
+        return result;
     }
     
     /**
