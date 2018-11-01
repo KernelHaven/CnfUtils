@@ -9,7 +9,6 @@ import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
-import net.ssehub.kernel_haven.util.null_checks.NullHelpers;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
@@ -41,18 +40,24 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
 
     @Override
     public Formula visitNegation(@NonNull Negation formula) {
-        Formula inner = formula.getFormula();
-        Formula result = inner.accept(this);
+        Formula inner = formula.getFormula().accept(this);
+
+        Formula result;
         
-        if (result instanceof Negation) {
+        if (inner instanceof Negation) {
             // Double negation
-            result = ((Negation) result).getFormula();
-        } else if (result instanceof True) {
+            result = ((Negation) inner).getFormula();
+        } else if (inner instanceof True) {
             result = False.INSTANCE;
-        } else if (result instanceof False) {
+        } else if (inner instanceof False) {
             result = True.INSTANCE;
         } else {
-            result = formula;
+            // only create new instance if nested changed
+            if (inner != formula.getFormula()) {
+                result = new Negation(inner);
+            } else {
+                result = formula;
+            }
         }
         
         return result;
@@ -60,8 +65,8 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
 
     @Override
     public Formula visitDisjunction(@NonNull Disjunction formula) {
-        Formula left = NullHelpers.notNull(formula.getLeft().accept(this));
-        Formula right = NullHelpers.notNull(formula.getRight().accept(this));
+        Formula left = formula.getLeft().accept(this);
+        Formula right = formula.getRight().accept(this);
         
         Formula result = null;
         if (left.equals(right)) {
@@ -152,8 +157,8 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
     @Override
     public Formula visitConjunction(@NonNull Conjunction formula) {
     // CHECKSTYLE:ON
-        Formula left = NullHelpers.notNull(formula.getLeft().accept(this));
-        Formula right = NullHelpers.notNull(formula.getRight().accept(this));
+        Formula left = formula.getLeft().accept(this);
+        Formula right = formula.getRight().accept(this);
         
         Formula result = null;
         if (left.equals(right)) {
