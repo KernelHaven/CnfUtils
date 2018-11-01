@@ -83,7 +83,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     @Override
     public Formula visitDisjunction(@NonNull Disjunction formula) {
     // CHECKSTYLE:ON
-        List<@NonNull Formula> terms = new ArrayList<>();
+        List<Formula> terms = new ArrayList<>();
         
         AtomicBoolean containsTrue = new AtomicBoolean(false);
         FormulaStructureChecker.getAllDisjunctionTerms(formula).stream()
@@ -170,7 +170,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         
         Formula result = notNull(terms.get(0));
         for (int i = 1; i < terms.size(); i++) {
-            result = new Disjunction(result, terms.get(i));
+            result = new Disjunction(result, notNull(terms.get(i)));
         }
         
         return result;
@@ -180,7 +180,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     @Override
     public Formula visitConjunction(@NonNull Conjunction formula) {
     // CHECKSTYLE:ON
-        List<@NonNull Formula> terms = new ArrayList<>();
+        List<Formula> terms = new ArrayList<>();
         
         AtomicBoolean containsFalse = new AtomicBoolean(false);
         FormulaStructureChecker.getAllConjunctionTerms(formula).stream()
@@ -267,7 +267,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         
         Formula result = notNull(terms.get(0));
         for (int i = 1; i < terms.size(); i++) {
-            result = new Conjunction(result, terms.get(i));
+            result = new Conjunction(result, notNull(terms.get(i)));
         }
         
         return result;
