@@ -111,11 +111,14 @@ public class LogicUtils {
      * https://github.com/bpodgursky/jbool_expressions</a>
      */
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
-        PerformanceProbe p = new PerformanceProbe("VisitorSimplifier 1) Library");
-        Formula firstSimplification = simplifyWithLibrary(formula);
-        p.close();
+        PerformanceProbe p;
         
-        p = new PerformanceProbe("VisitorSimplifier 2) Visitor");
+//        p = new PerformanceProbe("VisitorSimplifier 1) Library");
+//        Formula firstSimplification = simplifyWithLibrary(formula);
+//        p.close();
+        Formula firstSimplification = formula;
+        
+        p = new PerformanceProbe("VisitorSimplifier");
         Formula result = firstSimplification.accept(new FormulaSimplificationVisitor());
         p.close();
         
