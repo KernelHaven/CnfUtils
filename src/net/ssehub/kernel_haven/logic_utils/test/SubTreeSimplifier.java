@@ -127,18 +127,19 @@ public class SubTreeSimplifier {
                     .forEach(trees::add);
             p.close();
 
+            PerformanceProbe p2 = new PerformanceProbe("SubTreeSimplifier 2) Replacing & Simplifying");
             Variable replacement = new Variable("TMP_REPLACE");
             for (List<@NonNull Formula> subTreeList : trees) {
 
-                p = new PerformanceProbe("SubTreeSimplifier 2) Replace");
+                p = new PerformanceProbe("SubTreeSimplifier 2.1) Replace");
                 Formula withRepl = replaceAll(formula, subTreeList, replacement);
                 p.close();
                 
-                p = new PerformanceProbe("SubTreeSimplifier 3) Simplify");
+                p = new PerformanceProbe("SubTreeSimplifier 2.2) Simplify");
                 Formula withReplSimpl = LogicUtils.simplifyWithVisitor(withRepl);
                 p.close();
 
-                p = new PerformanceProbe("SubTreeSimplifier 4) Re-replace & Check");
+                p = new PerformanceProbe("SubTreeSimplifier 2.3) Re-replace & Check");
                 Formula woReplSimpl = replaceAll(withReplSimpl, Arrays.asList(replacement), subTreeList.get(0));
 
                 boolean thisIterationChanged = !isStructurallyEqual(woReplSimpl, formula);
@@ -149,6 +150,7 @@ public class SubTreeSimplifier {
                     formula = woReplSimpl;
                 }
             }
+            p2.close();
             
         } while (changed);
 
