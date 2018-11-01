@@ -117,7 +117,7 @@ public class LogicUtils {
         Formula firstSimplification = formula;
         
         p = new PerformanceProbe("VisitorSimplifier");
-        Formula result = firstSimplification.accept(new FormulaSimplificationVisitor());
+        Formula result = firstSimplification.accept(new FormulaSimplificationVisitor2());
         p.close();
         
         return result;
