@@ -107,8 +107,6 @@ public class LogicUtils {
      * @param formula The formula to simplify. Must not be <code>null</code>.
      * 
      * @return The simplified formula. Not <code>null</code>.
-     * @see <a href="https://github.com/bpodgursky/jbool_expressions">
-     * https://github.com/bpodgursky/jbool_expressions</a>
      */
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
         PerformanceProbe p;

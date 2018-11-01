@@ -266,7 +266,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
      * @param negatedConjunction The conjunction to test (<tt>!(!A &and; B)</tt> in the example).
      * @return A simplified formula or <tt>null</tt> if the case could not be found.
      */
-    public Formula negatedAndComplementation(@NonNull Negation negatedVar, @NonNull Conjunction negatedConjunction) {
+    private Formula negatedAndComplementation(@NonNull Negation negatedVar, @NonNull Conjunction negatedConjunction) {
         
         Formula result = null;
         Formula innerLeft = negatedConjunction.getLeft();
@@ -413,7 +413,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
      * @param negatedDisjunction The disjunction to test (<tt>(A &or; B)</tt> in the example).
      * @return A simplified formula or <tt>null</tt> if the case could not be found.
      */
-    public Formula negatedOrComplementation(@NonNull Negation negatedVar, @NonNull Disjunction negatedDisjunction) {
+    private Formula negatedOrComplementation(@NonNull Negation negatedVar, @NonNull Disjunction negatedDisjunction) {
         
         Formula result = null;
         Formula innerLeft = negatedDisjunction.getLeft();
