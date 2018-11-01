@@ -11,8 +11,8 @@ import java.util.Random;
 
 import net.ssehub.kernel_haven.cnf.ConverterException;
 import net.ssehub.kernel_haven.cnf.SolverException;
-import net.ssehub.kernel_haven.logic_utils.FormulaEqualityChecker;
 import net.ssehub.kernel_haven.logic_utils.LogicUtils;
+import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.False;
@@ -21,10 +21,7 @@ import net.ssehub.kernel_haven.util.logic.FormulaSimplifier;
 import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.logic.Variable;
-import net.ssehub.kernel_haven.util.logic.parser.CStyleBooleanGrammar;
 import net.ssehub.kernel_haven.util.logic.parser.ExpressionFormatException;
-import net.ssehub.kernel_haven.util.logic.parser.Parser;
-import net.ssehub.kernel_haven.util.logic.parser.VariableCache;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
@@ -192,30 +189,45 @@ public class AdamsAwesomeSimplifier {
      */
     public static @NonNull Formula simplify(@NonNull Formula formula) {
         debugPrintFormula(formula, "Step 0: Original");
+
+        PerformanceProbe p;
         
         // Step 1: prune all constants
+        p = new PerformanceProbe("AAS: 1) Prune Constants");
         formula = FormulaSimplifier.defaultSimplifier(formula);
         debugPrintFormula(formula, "Step 1: Pruned Constants");
+        p.close();
+        
         
         // Step 2: move all negations inwards
+        p = new PerformanceProbe("AAS: 2) Move Negations Inward");
         formula = moveNegationInwards(formula);
         debugPrintFormula(formula, "Step 2: Negations Moved In");
+        p.close();
         
         // Step 3: simple simplification
+        p = new PerformanceProbe("AAS: 3) Simple Simplification");
         formula = LogicUtils.simplifyWithVisitor(formula);
         debugPrintFormula(formula, "Step 3: Simple Simplificiaton");
+        p.close();
         
         // Step 4: sub-tree group simplifier
+        p = new PerformanceProbe("AAS: 4) Sub-Tree Simplifier");
         formula = SubTreeSimplifier.simplify(formula);
         debugPrintFormula(formula, "Step 4: Sub-tree Simplifier");
+        p.close();
         
         // Step 5: move negations outward again (where applicable)
+        p = new PerformanceProbe("AAS: 5) Move Negations Outward");
         formula = moveNegationOutwards(formula);
         debugPrintFormula(formula, "Step 5: Negations Moved Out");
+        p.close();
         
         // Step 6: sub-tree group simplifier
+        p = new PerformanceProbe("AAS: 6) Sub-Tree Simplifier");
         formula = SubTreeSimplifier.simplify(formula);
         debugPrintFormula(formula, "Step 6: Sub-tree Simplifier");
+        p.close();
         
         return formula;
     }
@@ -228,7 +240,6 @@ public class AdamsAwesomeSimplifier {
      * 
      * @return A random {@link Formula}.
      */
-    @SuppressWarnings("unused")
     private static @NonNull Formula generateRandomFormula(@NonNull Random random, int depth) {
         Formula result;
         
@@ -277,20 +288,26 @@ public class AdamsAwesomeSimplifier {
      * @throws ConverterException .
      */
     public static void main(String[] args) throws ExpressionFormatException, SolverException, ConverterException {
-        Parser<@NonNull Formula> parser = new Parser<>(new CStyleBooleanGrammar(new VariableCache()));
+//        Parser<@NonNull Formula> parser = new Parser<>(new CStyleBooleanGrammar(new VariableCache()));
 //        Formula f = parser.parse("((A || B) && C) || ((A || B) && !C)");
 //        Formula f = parser.parse("(D || E || (F && (D || E))) && (!(D || E) || !(F && (D || E)))");
-        Formula f = parser.parse("(G || H || ((G || H) && (X_1 || X_2 || X_45))) && (!(G || H) || !((G || H) && (X_1 "
-                + "|| X_2 || X_45)))");
+//        Formula f = parser.parse("(G || H || ((G || H) && (X_1 || X_2 || X_45))) && (!(G || H) || !((G || H) && (X_1 "
+//                + "|| X_2 || X_45)))");
         
-//        Formula f = generateRandomFormula(new Random(), 0);
-        Formula original = f;
+        for (int i = 0; i < 1000; i++) {
+            Formula f = generateRandomFormula(new Random(), 0);
+//            Formula original = f;
+            
+//        debug = true;
+            simplify(f);
+            
+        }
         
-        debug = true;
-        simplify(f);
+//        System.out.println();
+//        System.out.println("Logically equal? " + new FormulaEqualityChecker().isLogicallyEqual(f, original));
         
-        System.out.println();
-        System.out.println("Logically equal? " + new FormulaEqualityChecker().isLogicallyEqual(f, original));
+        
+        PerformanceProbe.printResult();
     }
 
 }

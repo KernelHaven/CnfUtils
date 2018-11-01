@@ -9,6 +9,7 @@ import java.util.List;
 
 import net.ssehub.kernel_haven.logic_utils.LogicUtils;
 import net.ssehub.kernel_haven.util.Logger;
+import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.Formula;
@@ -97,6 +98,7 @@ public class SubTreeSimplifier {
      */
     public static @NonNull Formula simplify(@NonNull Formula formula) {
 
+        PerformanceProbe p;
         SubTreeGroupFinder subTreeFinder = new SubTreeGroupFinder();
 
         int iteration = 0;
@@ -109,6 +111,7 @@ public class SubTreeSimplifier {
                 break;
             }
             
+            p = new PerformanceProbe("SubTreeSimplifier 1) Find Trees");
             List<@NonNull List<@NonNull Formula>> trees = new LinkedList<>();
             subTreeFinder.findGroups(formula).stream()
                     .filter((list) -> list.size() > 1)
@@ -122,17 +125,25 @@ public class SubTreeSimplifier {
                         Integer.compare(notNull(l2.get(0)).toString().length(), notNull(l1.get(0)).toString().length()))
                     
                     .forEach(trees::add);
+            p.close();
 
             Variable replacement = new Variable("TMP_REPLACE");
             for (List<@NonNull Formula> subTreeList : trees) {
 
+                p = new PerformanceProbe("SubTreeSimplifier 2) Replace");
                 Formula withRepl = replaceAll(formula, subTreeList, replacement);
+                p.close();
+                
+                p = new PerformanceProbe("SubTreeSimplifier 3) Simplify");
                 Formula withReplSimpl = LogicUtils.simplifyWithVisitor(withRepl);
+                p.close();
 
+                p = new PerformanceProbe("SubTreeSimplifier 4) Re-replace & Check");
                 Formula woReplSimpl = replaceAll(withReplSimpl, Arrays.asList(replacement), subTreeList.get(0));
 
                 boolean thisIterationChanged = !isStructurallyEqual(woReplSimpl, formula);
                 changed |= thisIterationChanged;
+                p.close();
 
                 if (thisIterationChanged) {
                     formula = woReplSimpl;
