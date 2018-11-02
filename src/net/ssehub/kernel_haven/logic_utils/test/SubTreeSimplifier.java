@@ -139,17 +139,15 @@ public class SubTreeSimplifier {
                 Formula withReplSimpl = LogicUtils.simplifyWithVisitor(withRepl);
                 p.close();
 
-                p = new PerformanceProbe("SubTreeSimplifier 2.3) Re-replace");
-                Formula woReplSimpl = replaceAll(withReplSimpl, Arrays.asList(replacement), subTreeList.get(0));
-                p.close();
-                
-                p = new PerformanceProbe("SubTreeSimplifier 2.4) Check");
-                boolean thisIterationChanged = !isStructurallyEqual(woReplSimpl, formula);
+                p = new PerformanceProbe("SubTreeSimplifier 2.3) Check");
+                boolean thisIterationChanged = !isStructurallyEqual(withRepl, withReplSimpl);
                 changed |= thisIterationChanged;
                 p.close();
-
+                
                 if (thisIterationChanged) {
-                    formula = woReplSimpl;
+                    p = new PerformanceProbe("SubTreeSimplifier 2.4) Re-replace");
+                    formula = replaceAll(withReplSimpl, Arrays.asList(replacement), subTreeList.get(0));
+                    p.close();
                 }
             }
             p2.close();
