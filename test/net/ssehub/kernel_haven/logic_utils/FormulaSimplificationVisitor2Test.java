@@ -53,6 +53,7 @@ public class FormulaSimplificationVisitor2Test {
      * 
      * @return The parameters of this test.
      */
+    // CHECKSTYLE:OFF
     @Parameters(name = "{2}: {0} -> {1}")
     public static Collection<Object[]> getParameters() {
         Variable varA = new Variable("A");
@@ -71,12 +72,12 @@ public class FormulaSimplificationVisitor2Test {
             {and(or("A", "B"), "A"), varA, "Absorption \u2227"},
             {and("A", and(or("A", "B"), "C")), and("A", "C"), "Nested Absorption \u2227"},
             {and(and(or("A", "B"), "C"), "A"), and("A", "C"), "Nested Absorption \u2227"},
-//            {and(not("A"), not(and("A", "B"))), not("A"), "Negated Absorption \u2227"},
-//            {and(not(and("A", "B")), not("A")), not("A"), "Negated Absorption \u2227"},
             {and(not(not("A")), "B"), and("A", "B"), "Rewrite Simplified \u2227"},
             {and("B", not(not("A"))), and("B", "A"), "Rewrite Simplified \u2227"},
-            {and(not("A"), not(and(not("A"), "B"))), and(not("A"), not("B")), "Negation/Complement/Identity \u2227"},
-            {and(not(and(not("A"), "B")), not("A")), and(not("B"), not("A")), "Negation/Complement/Identity \u2227"},
+            {and(not("A"), or("A", "B")), and(not("A"), "B"), "Negated Variable Absorption \u2227"},
+            {and(or("A", "B"), not("A")), and("B", not("A")), "Negated Variable Absorption \u2227"},
+            {and(not("A"), or("A", or("B", "C"))), and(not("A"), or("C", "B")), "Negated Variable Absorption Multiple \u2227"},
+            {and(or("A", or("B", "C")), not("A")), and(or("C", "B"), not("A")), "Negated Variable Absorption Multiple \u2227"},
             
             {and(not("A"), not(and(not("C"), "B"))), and(not("A"), not(and(not("C"), "B"))), "No Rule Applies \u2227"},
             {and(not(and(not("C"), "B")), not("A")), and(not(and(not("C"), "B")), not("A")), "No Rule Applies \u2227"},
@@ -96,12 +97,12 @@ public class FormulaSimplificationVisitor2Test {
             {or(and("A", "B"), "A"), varA, "Absorption \u2228"},
             {or("A", or(and("A", "B"), "C")), or("A", "C"), "Nested Absorption \u2228"},
             {or(or(and("A", "B"), "C"), "A"), or("A", "C"), "Nested Absorption \u2228"},
-//            {or(not("A"), not(or("A", "B"))), not("A"), "Negated Absorption \u2228"},
-//            {or(not(or("A", "B")), not("A")), not("A"), "Negated Absorption \u2228"},
             {or(not(not("A")), "B"), or("A", "B"), "Rewrite Simplified \u2228"},
             {or("B", not(not("A"))), or("B", "A"), "Rewrite Simplified \u2228"},
-            {or(not("A"), not(or(not("A"), "B"))), or(not("A"), not("B")), "Negation/Complement/Identity \u2228"},
-            {or(not(or(not("A"), "B")), not("A")), or(not("B"), not("A")), "Negation/Complement/Identity \u2228"},
+            {or(not("A"), and("A", "B")), or(not("A"), "B"), "Negated Variable Absorption \u2228"},
+            {or(and("A", "B"), not("A")), or("B", not("A")), "Negated Variable Absorption \u2228"},
+            {or(not("A"), and("A", and("B", "C"))), or(not("A"), and("C", "B")), "Negated Variable Absorption Multiple \u2228"},
+            {or(and("A", and("B", "C")), not("A")), or(and("C", "B"), not("A")), "Negated Variable Absorption Multiple \u2228"},
             
             {or(not("A"), not(or(not("C"), "B"))), or(not("A"), not(or(not("C"), "B"))), "No Rule Applies \u2228"},
             {or(not(or(not("C"), "B")), not("A")), or(not(or(not("C"), "B")), not("A")), "No Rule Applies \u2228"},
@@ -117,11 +118,11 @@ public class FormulaSimplificationVisitor2Test {
             // Complex / scenario tests
             {or("A", or(and("C", or("D", "E")), and("A", "B"))), or("A", and("C", or("D", "E"))), "Complex Absorbtion"},
             {or(or(or("D", "E"), "F"), "D"), or(or("D", "F"), "E"), "Unbalanced OR-Tree"},
-            {and(or(and("A", "B"), "C"), or(or("D", "E"), or("F", "D"))),
-                and(or(and("A", "B"), "C"), or(or("D", "E"), "F")), "Complex keeps (almost) same"},
+            {and(or(and("A", "B"), "C"), or(or("D", "E"), or("F", "D"))),  and(or(and("A", "B"), "C"), or(or("D", "E"), "F")), "Complex keeps (almost) same"},
             
         });
     }
+    // CHECKSTYLE:ON
     
     /**
      * The parameterized test method.
@@ -130,7 +131,7 @@ public class FormulaSimplificationVisitor2Test {
      * @throws SolverException If SAT-solving fails.
      */
     @Test
-    public void test() throws SolverException, ConverterException {
+   public void test() throws SolverException, ConverterException {
         FormulaSimplificationVisitor2 simplifier = new FormulaSimplificationVisitor2();
         Formula simplified = inputFormula.accept(simplifier);
         

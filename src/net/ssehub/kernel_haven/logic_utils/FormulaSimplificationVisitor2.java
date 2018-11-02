@@ -1,5 +1,7 @@
 package net.ssehub.kernel_haven.logic_utils;
 
+import static net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker.getAllConjunctionTerms;
+import static net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker.getAllDisjunctionTerms;
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import java.util.ArrayList;
@@ -79,14 +81,14 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     }
 
 
-    // CHECKSTYLE:OFF // TODO method too long
+    // CHECKSTYLE:OFF // method too long
     @Override
     public Formula visitDisjunction(@NonNull Disjunction formula) {
     // CHECKSTYLE:ON
         List<Formula> terms = new ArrayList<>();
         
         AtomicBoolean containsTrue = new AtomicBoolean(false);
-        FormulaStructureChecker.getAllDisjunctionTerms(formula).stream()
+        getAllDisjunctionTerms(formula).stream()
                 .map((term) -> term.accept(this))
                 .forEach((term) -> {
                     if (term == True.INSTANCE) {
@@ -109,61 +111,52 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 Formula left = notNull(terms.get(li)); 
                 Formula right = notNull(terms.get(ri)); 
                 
-                if (left.equals(right)) {
+                if (isSameVariable(left, right)) {
                     // Idempotence: A v A -> A
                     // remove right term and continue
                     terms.remove(ri);
                     ri--;
-                } else if (left instanceof Negation && ((Negation) left).getFormula().equals(right)) {
+                    
+                } else if (isNegation(left) && isSameVariable(((Negation) left).getFormula(), right)) {
                     // Complementation: !A v A -> true
                     // whole disjunction becomes true
                     return True.INSTANCE;
-                } else if (right instanceof Negation && ((Negation) right).getFormula().equals(left)) {
+                    
+                } else if (isNegation(right) && isSameVariable(((Negation) right).getFormula(), left)) {
                     // Complementation: A v !A -> true
                     // whole disjunction becomes true
                     return True.INSTANCE;
-                } else if (left instanceof Variable && right instanceof Conjunction
-                            && isOrAbsorption((Variable) left, (Conjunction) right)) {
+                    
+                } else if (isOrAbsorption(left, right)) {
                     // Classical Absorption: A v (A ^ B) -> A
                     // remove right term and continue
                     terms.remove(ri);
                     ri--;
-                } else if (right instanceof Variable && left instanceof Conjunction
-                        && isOrAbsorption((Variable) right, (Conjunction) left)) {
+                    
+                } else if (isOrAbsorption(right, left)) {
                     // Classical Absorption: (A ^ B) v A -> A
                     // remove left term and continue
                     terms.remove(li);
                     li--;
                     break; // break inner loop, since we modified li
-                } else if (left instanceof Negation && right instanceof Negation) {
-                    Formula nestedLeft = ((Negation) left).getFormula();
-                    Formula nestedRight = ((Negation) right).getFormula();
                     
-                    if (nestedLeft instanceof Variable && nestedRight instanceof Disjunction) {
-                        // Check for combination of complementation, De Morgan, Identity
-                        Formula tmp = negatedOrComplementation((Negation) left, (Disjunction) nestedRight);
-                        
-                        if (tmp != null) {
-                            // tmp replaces ri
-                            terms.set(ri, tmp);
-                            li = -1; // restart
-                            break;
-                        }
-                        
-                    } else if (nestedRight instanceof Variable && nestedLeft instanceof Disjunction) {
-                        // Check for combination of complementation, De Morgan, Identity
-                        Formula tmp = negatedOrComplementation((Negation) right, (Disjunction) nestedLeft);
-                        
-                        if (tmp != null) {
-                            // tmp replaces li
-                            terms.set(li, tmp);
-                            li = -1; // restart
-                            break;
-                        }
-                        
-                    }
+                } else if (isNegatedOrAbsorption(left, right)) {
+                    // Negated Absorption: !A v (A ^ B) -> !A v B
+                    // replace right term
+                    Formula replacement = getLeftOverNegatedOrAbsorption(getNegatedVariable(left), (Conjunction) right);
+                    terms.set(ri, replacement);
+                    li = -1; // restart
+                    break;
+                    
+                } else if (isNegatedOrAbsorption(right, left)) {
+                    // Negated Absorption: (A ^ B) v !A -> B v !A
+                    // replace left term
+                    Formula replacement = getLeftOverNegatedOrAbsorption(getNegatedVariable(right), (Conjunction) left);
+                    terms.set(li, replacement);
+                    li = -1; // restart
+                    break;
+                    
                 }
-                
             }
         }
         
@@ -175,14 +168,14 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         return result;
     }
 
-    // CHECKSTYLE:OFF
+    // CHECKSTYLE:OFF // method too long
     @Override
     public Formula visitConjunction(@NonNull Conjunction formula) {
     // CHECKSTYLE:ON
         List<Formula> terms = new ArrayList<>();
         
         AtomicBoolean containsFalse = new AtomicBoolean(false);
-        FormulaStructureChecker.getAllConjunctionTerms(formula).stream()
+        getAllConjunctionTerms(formula).stream()
                 .map((term) -> term.accept(this))
                 .forEach((term) -> {
                     if (term == False.INSTANCE) {
@@ -205,59 +198,52 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 Formula left = notNull(terms.get(li)); 
                 Formula right = notNull(terms.get(ri)); 
                 
-                if (left.equals(right)) {
+                if (isSameVariable(left, right)) {
                     // Idempotence: A ^ A -> A
                     // remove right term and continue
                     terms.remove(ri);
                     ri--;
-                } else if (left instanceof Negation && ((Negation) left).getFormula().equals(right)) {
+                    
+                } else if (isNegation(left) && isSameVariable(((Negation) left).getFormula(), right)) {
                     // Complementation: !A ^ A -> false
                     // whole conjunction becomes false
                     return False.INSTANCE;
-                } else if (right instanceof Negation && ((Negation) right).getFormula().equals(left)) {
+                    
+                } else if (isNegation(right) && isSameVariable(((Negation) right).getFormula(), left)) {
                     // Complementation: A ^ !A -> false
                     // whole conjunction becomes false
                     return False.INSTANCE;
-                } else if (left instanceof Variable && right instanceof Disjunction
-                            && isAndAbsorption((Variable) left, (Disjunction) right)) {
+                    
+                } else if (isAndAbsorption(left, right)) {
                     // Classical Absorption: A ^ (A v B) -> A
                     // remove right term and continue
                     terms.remove(ri);
                     ri--;
-                } else if (right instanceof Variable && left instanceof Disjunction
-                        && isAndAbsorption((Variable) right, (Disjunction) left)) {
+                    
+                } else if (isAndAbsorption(right, left)) {
                     // Classical Absorption: (A v B) ^ A -> A
                     // remove left term and continue
                     terms.remove(li);
                     li--;
                     break; // break inner loop, since we modified li
-                } else if (left instanceof Negation && right instanceof Negation) {
-                    Formula nestedLeft = ((Negation) left).getFormula();
-                    Formula nestedRight = ((Negation) right).getFormula();
                     
-                    if (nestedLeft instanceof Variable && nestedRight instanceof Conjunction) {
-                        // Check for combination of complementation, De Morgan, Identity
-                        Formula tmp = negatedAndComplementation((Negation) left, (Conjunction) nestedRight);
-                        
-                        if (tmp != null) {
-                            // tmp replaces ri
-                            terms.set(ri, tmp);
-                            li = -1; // restart
-                            break;
-                        }
-                        
-                    } else if (nestedRight instanceof Variable && nestedLeft instanceof Conjunction) {
-                        // Check for combination of complementation, De Morgan, Identity
-                        Formula tmp = negatedAndComplementation((Negation) right, (Conjunction) nestedLeft);
-                        
-                        if (tmp != null) {
-                            // tmp replaces li
-                            terms.set(li, tmp);
-                            li = -1; // restart
-                            break;
-                        }
-                        
-                    }
+                } else if (isNegatedAndAbsorption(left, right)) {
+                    // Negated Absorption: !A ^ (A v B) -> !A ^ B
+                    // replace right term
+                    Formula replacement
+                        = getLeftOverNegatedAndAbsorption(getNegatedVariable(left), (Disjunction) right);
+                    terms.set(ri, replacement);
+                    li = -1; // restart
+                    break;
+                    
+                } else if (isNegatedAndAbsorption(right, left)) {
+                    // Negated Absorption: (A v B) ^ !A -> B ^ !A
+                    // replace left term
+                    Formula replacement
+                        = getLeftOverNegatedAndAbsorption(getNegatedVariable(right), (Disjunction) left);
+                    terms.set(li, replacement);
+                    li = -1; // restart
+                    break;
                 }
                 
             }
@@ -272,64 +258,25 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     }
 
     /**
-     * Checks and resolves a negated AND complementation, identity, De Morgan.
-     * Does the following transformations:<br/>
-     * <pre><code>   !A &and; !(!A &and; B)
-     * &rarr; !A &and; (A &or; !B)          | De Morgan, Double Negation
-     * &rarr; (!A &and; A) &or; (!A &and; !B)   | Distribution
-     * &rarr; (!A &and; !B)              | Complementation, Identity &or;</code></pre>
-     *
-     * @param negatedVar The negated variable (<tt>!A</tt> in the example).
-     * @param negatedConjunction The conjunction to test (<tt>!(!A &and; B)</tt> in the example).
+     * Checks if the absorption rule applies. A &or; (A &and; B) &rarr; A.
      * 
-     * @return The term that replaces the {@link Conjunction} (!B in the example).
+     * @param possibleVar The variable that absorbs the conjunction (A in the example).
+     * @param possibleConjunction The conjunction that is absorbed ((A &and; B) in the example).
+     * 
+     * @return Whether the absorption rule applies to the given formulas.
      */
-    private Formula negatedAndComplementation(@NonNull Negation negatedVar, @NonNull Conjunction negatedConjunction) {
+    private boolean isOrAbsorption(@NonNull Formula possibleVar, @NonNull Formula possibleConjunction) {
+        boolean result = false;
         
-        Formula result = null;
-        Formula innerLeft = negatedConjunction.getLeft();
-        Formula innerRight = negatedConjunction.getRight();
-        
-        if (negatedVar.equals(innerLeft)) {
-            Formula right = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
-                : new Negation(innerRight);
-            result = right;
-        } else if (negatedVar.equals(innerRight)) {
-            Formula right = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
-                    : new Negation(innerLeft);
-            result = right;
-        }
-        
-        if (null != result) {
-            // Try to simplify the new result
-            result = result.accept(this);
-        }
-        
-        return result;
-    }
-
-    /**
-     * Recursive test if a conjunction fulfills the absorption rule.
-     * @param var The variable of a conjunction.
-     * @param disjunction The disjunction of a conjunction (will be recursively traversed if a compound disjunction).
-     * @return <tt>true</tt> if it fulfills the absorption rule, i.e., if it can be simplified, <tt>false</tt>
-     *     otherwise.
-     */
-    private boolean isAndAbsorption(Variable var, Disjunction disjunction) {
-        Formula left = disjunction.getLeft();
-        Formula right = disjunction.getRight();
-        
-        boolean result = var.equals(left) || var.equals(right);
-        
-        // Recursive part
-        if (!result) {
-            if (left instanceof Disjunction) {
-                result = isAndAbsorption(var, (Disjunction) left);
-            }
-        }
-        if (!result) {
-            if (right instanceof Disjunction) {
-                result = isAndAbsorption(var, (Disjunction) right);
+        if (isVariable(possibleVar) && isConjunction(possibleConjunction)) {
+            Variable var = (Variable) possibleVar;
+            List<@NonNull Formula> terms = getAllConjunctionTerms((Conjunction) possibleConjunction);
+            
+            for (Formula term : terms) {
+                if (isSameVariable(var, term)) {
+                    result = true;
+                    break;
+                }
             }
         }
         
@@ -337,64 +284,220 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     }
     
     /**
-     * Checks and resolves a negated OR complementation, identity, De Morgan.
-     * Does the following transformations:<br/>
-     * <pre><code>   !A &or; !(!A &or; B)
-     * &rarr; !A &or; (A &and; !B)          | De Morgan, Double Negation
-     * &rarr; (!A &or; A) &and; (!A &or; !B)   | Distribution
-     * &rarr; (!A &or; !B)              | Complementation, Identity &or;</code></pre>
-     *
-     * @param negatedVar The negated variable (<tt>!A</tt> in the example).
-     * @param negatedDisjunction The disjunction to test (<tt>(A &or; B)</tt> in the example).
-     * @return The term that replaces the {@link Disjunction} (!B in the example).
+     * Checks if the negated absorption rule applies. !A &or; (A &and; B) &rarr; !A &or; B.
+     * 
+     * @param possibleNegatedVar The negated variable that absorbs parts of the conjunction (!A in the example).
+     * @param possibleConjunction The conjunction that is partly absorbed ((A &and; B) in the example).
+     * 
+     * @return Whether the negated absorption rule applies to the given formulas.
      */
-    private Formula negatedOrComplementation(@NonNull Negation negatedVar, @NonNull Disjunction negatedDisjunction) {
+    private boolean isNegatedOrAbsorption(@NonNull Formula possibleNegatedVar, @NonNull Formula possibleConjunction) {
+        boolean result = false;
         
-        Formula result = null;
-        Formula innerLeft = negatedDisjunction.getLeft();
-        Formula innerRight = negatedDisjunction.getRight();
-        
-        if (negatedVar.equals(innerLeft)) {
-            Formula right = innerRight instanceof Negation ? ((Negation) innerRight).getFormula()
-                : new Negation(innerRight);
-            result = right;
-        } else if (negatedVar.equals(innerRight)) {
-            Formula right = innerLeft instanceof Negation ? ((Negation) innerLeft).getFormula()
-                    : new Negation(innerLeft);
-            result = right;
-        }
-        
-        if (null != result) {
-            // Try to simplify the new result
-            result = result.accept(this);
+        if (isNegatedVariable(possibleNegatedVar) && isConjunction(possibleConjunction)) {
+            Variable var = getNegatedVariable(possibleNegatedVar);
+            List<@NonNull Formula> terms = getAllConjunctionTerms((Conjunction) possibleConjunction);
+            
+            for (Formula term : terms) {
+                if (isSameVariable(var, term)) {
+                    result = true;
+                    break;
+                }
+            }
         }
         
         return result;
     }
     
     /**
-     * Recursive test if a disjunction fulfills the absorption rule.
-     * @param var The variable of a disjunction.
-     * @param conjunction The conjunction of a disjunction (will be recursively traversed if a compound conjunction).
-     * @return <tt>true</tt> if it fulfills the absorption rule, i.e., if it can be simplified, <tt>false</tt>
-     *     otherwise.
+     * Returns the left-over conjunction that remains after the negated or absoprtion.
+     * !A &or; (A &and; B) &rarr; !A &or; B.
+     * 
+     * @param var The variable that absorbs parts of the conjunction (A in the example).
+     * @param conjunction The conjunction that is partly absorbed ((A &and; B) in the example).
+     * 
+     * @return The left-over conjunction. (B in the example).
+     * 
+     * @see #isNegatedOrAbsorption(Formula, Formula)
      */
-    private boolean isOrAbsorption(Variable var, Conjunction conjunction) {
-        Formula left = conjunction.getLeft();
-        Formula right = conjunction.getRight();
+    private @NonNull Formula getLeftOverNegatedOrAbsorption(@NonNull Variable var, @NonNull Conjunction conjunction) {
+        List<@NonNull Formula> terms = getAllConjunctionTerms(conjunction);
+        Formula result = null;
         
-        boolean result = var.equals(left) || var.equals(right);
-        
-        // Recursive part
-        if (!result) {
-            if (left instanceof Conjunction) {
-                result = isOrAbsorption(var, (Conjunction) left);
+        for (Formula term : terms) {
+            if (!isSameVariable(term, var)) {
+                if (result == null) {
+                    result = term;
+                } else {
+                    result = new Conjunction(result, term);
+                }
             }
         }
-        if (!result) {
-            if (right instanceof Conjunction) {
-                result = isOrAbsorption(var, (Conjunction) right);
+        
+        return notNull(result);
+    }
+    
+    /**
+     * Checks if the absorption rule applies. A &and; (A &or; B) &rarr; A.
+     * 
+     * @param possibleVar The variable that absorbs the disjunction (A in the example).
+     * @param possibleDisjunction The disjunction that is absorbed ((A &or; B) in the example).
+     * 
+     * @return Whether the absorption rule applies to the given formulas.
+     */
+    private boolean isAndAbsorption(@NonNull Formula possibleVar, @NonNull Formula possibleDisjunction) {
+        boolean result = false;
+        
+        if (isVariable(possibleVar) && isDisjunction(possibleDisjunction)) {
+            Variable var = (Variable) possibleVar;
+            List<@NonNull Formula> terms = getAllDisjunctionTerms((Disjunction) possibleDisjunction);
+            
+            for (Formula term : terms) {
+                if (isSameVariable(var, term)) {
+                    result = true;
+                    break;
+                }
             }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Checks if the negated absorption rule applies. !A &and; (A &or; B) &rarr; !A &and; B.
+     * 
+     * @param possibleNegatedVar The negated variable that absorbs parts of the disjunction (!A in the example).
+     * @param possibleDisjunction The disjunction that is partly absorbed ((A &or; B) in the example).
+     * 
+     * @return Whether the negated absorption rule applies to the given formulas.
+     */
+    private boolean isNegatedAndAbsorption(@NonNull Formula possibleNegatedVar, @NonNull Formula possibleDisjunction) {
+        boolean result = false;
+        
+        if (isNegatedVariable(possibleNegatedVar) && isDisjunction(possibleDisjunction)) {
+            Variable var = getNegatedVariable(possibleNegatedVar);
+            List<@NonNull Formula> terms = getAllDisjunctionTerms((Disjunction) possibleDisjunction);
+            
+            for (Formula term : terms) {
+                if (isSameVariable(var, term)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Returns the left-over disjunction that remains after the negated and absoprtion.
+     * !A &and; (A &or; B) &rarr; !A &and; B.
+     * 
+     * @param var The variable that absorbs parts of the disjunction (A in the example).
+     * @param disjunction The disjunction that is partly absorbed ((A &or; B) in the example).
+     * 
+     * @return The left-over disjunction. (B in the example).
+     * 
+     * @see #isNegatedAndAbsorption(Formula, Formula)
+     */
+    private @NonNull Formula getLeftOverNegatedAndAbsorption(@NonNull Variable var, @NonNull Disjunction disjunction) {
+        List<@NonNull Formula> terms = getAllDisjunctionTerms(disjunction);
+        Formula result = null;
+        
+        for (Formula term : terms) {
+            if (!isSameVariable(term, var)) {
+                if (result == null) {
+                    result = term;
+                } else {
+                    result = new Disjunction(result, term);
+                }
+            }
+        }
+        
+        return notNull(result);
+    }
+    
+    /**
+     * Checks if the given formula is a conjunction.
+     * 
+     * @param formula The formula to check.
+     * 
+     * @return Whether the formula is a conjunction.
+     */
+    private static boolean isConjunction(@NonNull Formula formula) {
+        return formula instanceof Conjunction;
+    }
+    
+    /**
+     * Checks if the given formula is a disjunction.
+     * 
+     * @param formula The formula to check.
+     * 
+     * @return Whether the formula is a disjunction.
+     */
+    private static boolean isDisjunction(@NonNull Formula formula) {
+        return formula instanceof Disjunction;
+    }
+    
+    /**
+     * Checks if the given formula is a negation.
+     * 
+     * @param formula The formula to check.
+     * 
+     * @return Whether the formula is a negation.
+     */
+    private static boolean isNegation(@NonNull Formula formula) {
+        return formula instanceof Negation;
+    }
+    
+    /**
+     * Checks if the given formula is a variable.
+     * 
+     * @param formula The formula to check.
+     * 
+     * @return Whether the formula is a variable.
+     */
+    private static boolean isVariable(@NonNull Formula formula) {
+        return formula instanceof Variable;
+    }
+    
+    /**
+     * Checks if the given formula is a negated variable.
+     * 
+     * @param formula The formula to check.
+     * 
+     * @return Whether the formula is a negated variable.
+     */
+    private static boolean isNegatedVariable(@NonNull Formula formula) {
+        return isNegation(formula) && isVariable(((Negation) formula).getFormula()); 
+    }
+    
+    /**
+     * Returns the variable that is nested inside the given negation.
+     * 
+     * @param formula A {@link Negation} that contains a {@link Variable}.
+     * 
+     * @return The variable that is inside the given negation.
+     * 
+     * @see #isNegatedVariable(Formula).
+     */
+    private static @NonNull Variable getNegatedVariable(@NonNull Formula formula) {
+        return (Variable) ((Negation) formula).getFormula();
+    }
+    
+    /**
+     * Checks if the two given formulas are {@link Variable}s and equal.
+     * 
+     * @param f1 The first formula.
+     * @param f2 The second formula.
+     * 
+     * @return Whether the two formulas are the same {@link Variable}.
+     */
+    private static boolean isSameVariable(@NonNull Formula f1, @NonNull Formula f2) {
+        boolean result = false;
+        
+        if (isVariable(f1) && isVariable(f2)) {
+            result = f1.equals(f2);
         }
         
         return result;
