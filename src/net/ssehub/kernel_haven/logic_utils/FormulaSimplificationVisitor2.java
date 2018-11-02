@@ -206,6 +206,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 for (Variable var : factoredOutvars) {
                     result = new Conjunction(notNull(var), result);
                 }
+                result.accept(this); // do simplification for the re-factored result
             }
         }
         
@@ -336,6 +337,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 for (Variable var : factoredOutvars) {
                     result = new Disjunction(notNull(var), result);
                 }
+                result = result.accept(this); // do simplification for the re-factored result
             }
         }
         
