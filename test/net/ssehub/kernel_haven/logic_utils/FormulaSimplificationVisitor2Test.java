@@ -78,6 +78,9 @@ public class FormulaSimplificationVisitor2Test {
             {and(or("A", "B"), not("A")), and("B", not("A")), "Negated Variable Absorption \u2227"},
             {and(not("A"), or("A", or("B", "C"))), and(not("A"), or("C", "B")), "Negated Variable Absorption Multiple \u2227"},
             {and(or("A", or("B", "C")), not("A")), and(or("C", "B"), not("A")), "Negated Variable Absorption Multiple \u2227"},
+            {and(or("A", "B"), or("A", "C")), or("A", and("B", "C")), "Factoring out \u2227"},
+            {and(or("A", or("B", "D")), or("A", "C")), or("A", and(or("D", "B"), "C")), "Factoring out larger \u2227"},
+            {and(or("A", "C"), or("A", "C")), or("A", "C"), "Factoring out same \u2227"},
             
             {and(not("A"), not(and(not("C"), "B"))), and(not("A"), not(and(not("C"), "B"))), "No Rule Applies \u2227"},
             {and(not(and(not("C"), "B")), not("A")), and(not(and(not("C"), "B")), not("A")), "No Rule Applies \u2227"},
@@ -103,6 +106,9 @@ public class FormulaSimplificationVisitor2Test {
             {or(and("A", "B"), not("A")), or("B", not("A")), "Negated Variable Absorption \u2228"},
             {or(not("A"), and("A", and("B", "C"))), or(not("A"), and("C", "B")), "Negated Variable Absorption Multiple \u2228"},
             {or(and("A", and("B", "C")), not("A")), or(and("C", "B"), not("A")), "Negated Variable Absorption Multiple \u2228"},
+            {or(and("A", "B"), and("A", "C")), and("A", or("B", "C")), "Factoring out \u2228"},
+            {or(and("A", and("B", "D")), and("A", "C")), and("A", or(and("D", "B"), "C")), "Factoring out larger \u2228"},
+            {or(and("A", "C"), and("A", "C")), and("A", "C"), "Factoring out same \u2228"},
             
             {or(not("A"), not(or(not("C"), "B"))), or(not("A"), not(or(not("C"), "B"))), "No Rule Applies \u2228"},
             {or(not(or(not("C"), "B")), not("A")), or(not(or(not("C"), "B")), not("A")), "No Rule Applies \u2228"},

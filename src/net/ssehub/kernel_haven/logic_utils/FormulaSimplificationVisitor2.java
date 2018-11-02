@@ -5,7 +5,10 @@ import static net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker.g
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker;
@@ -160,9 +163,50 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
             }
         }
         
-        Formula result = notNull(terms.get(0));
-        for (int i = 1; i < terms.size(); i++) {
-            result = new Disjunction(result, notNull(terms.get(i)));
+        // use newTerms from now on, so that terms is "effectively final" and can be used in lambda above
+        List<Formula> newTerms = terms;
+        
+        // Factoring out: (A ^ B) v (A ^ C) -> A ^ (B v C)
+        // 1) check if all terms are Conjunctions
+        boolean allConjunctions = true;
+        for (Formula term : newTerms) {
+            allConjunctions &= term instanceof Conjunction;
+            if (!allConjunctions) {
+                break;
+            }
+        }
+        Set<@NonNull Variable> factoredOutvars = null;
+        if (allConjunctions) {
+            // 2) find variables that appear in all of the terms
+            factoredOutvars = findVarThatAppearsInAllConjunctions(newTerms);
+            if (!factoredOutvars.isEmpty()) {
+                // 3) remove the variables from all the given terms
+                newTerms = removeFromAllConjunctions(newTerms, factoredOutvars);
+            }
+        }
+        
+        Formula result;
+        if (newTerms.isEmpty()) {
+            // special case: "factoring out" removed all terms completely; only factored out part remains
+            // factoredOutvars is not null if all terms have been "factored out"
+            Iterator<@NonNull Variable> it = notNull(factoredOutvars).iterator();
+            result = notNull(it.next());
+            while (it.hasNext()) {
+                result = new Conjunction(result, it.next());
+            }
+        } else {
+            // construct normal disjunction
+            result = notNull(newTerms.get(0));
+            for (int i = 1; i < newTerms.size(); i++) {
+                result = new Disjunction(result, notNull(newTerms.get(i)));
+            }
+            
+            if (factoredOutvars != null) {
+                // 4) add factored-out part
+                for (Variable var : factoredOutvars) {
+                    result = new Conjunction(var, result);
+                }
+            }
         }
         
         return result;
@@ -249,9 +293,178 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
             }
         }
         
-        Formula result = notNull(terms.get(0));
-        for (int i = 1; i < terms.size(); i++) {
-            result = new Conjunction(result, notNull(terms.get(i)));
+        // use newTerms from now on, so that terms is "effectively final" and can be used in lambda above
+        List<Formula> newTerms = terms;
+        
+        // Factoring out: (A v B) ^ (A v C) -> A v (B ^ C)
+        // 1) check if all terms are Disjunctions
+        boolean allDisjunctions = true;
+        for (Formula term : newTerms) {
+            allDisjunctions &= term instanceof Disjunction;
+            if (!allDisjunctions) {
+                break;
+            }
+        }
+        Set<@NonNull Variable> factoredOutvars = null;
+        if (allDisjunctions) {
+            // 2) find variables that appear in all of the terms
+            factoredOutvars = findVarThatAppearsInAllDisjunctions(newTerms);
+            if (!factoredOutvars.isEmpty()) {
+                // 3) remove the variables from all the given terms
+                newTerms = removeFromAllDisjunctions(newTerms, factoredOutvars);
+            }
+        }
+        
+        Formula result;
+        if (newTerms.isEmpty()) {
+            // special case: "factoring out" removed all terms completely; only factored out part remains
+            // factoredOutvars is not null if all terms have been "factored out"
+            Iterator<@NonNull Variable> it = notNull(factoredOutvars).iterator();
+            result = notNull(it.next());
+            while (it.hasNext()) {
+                result = new Disjunction(result, it.next());
+            }
+        } else {
+            // construct normal conjunction
+            result = notNull(newTerms.get(0));
+            for (int i = 1; i < newTerms.size(); i++) {
+                result = new Conjunction(result, notNull(newTerms.get(i)));
+            }
+            
+            if (factoredOutvars != null) {
+                // 4) add factored-out part
+                for (Variable var : factoredOutvars) {
+                    result = new Disjunction(var, result);
+                }
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Finds a set of variables that appear in all of the given conjunctions.
+     * 
+     * @param terms A list of {@link Conjunction}s.
+     * 
+     * @return A set of variables that appear in all conjunctions; may be empty.
+     */
+    private @NonNull Set<@NonNull Variable> findVarThatAppearsInAllConjunctions(@NonNull List<Formula> terms) {
+        Set<@NonNull Variable> result = null;
+        
+        for (Formula term : terms) {
+            List<@NonNull Formula> subTerms = getAllConjunctionTerms((Conjunction) notNull(term));
+            Set<@NonNull Variable> vars = new HashSet<>(subTerms.size());
+            for (Formula subTerm : subTerms) {
+                if (isVariable(subTerm)) {
+                    vars.add((Variable) subTerm);
+                }
+            }
+            
+            if (result == null) {
+                result = vars;
+            } else {
+                result.retainAll(vars);
+            }
+        }
+        
+        return notNull(result);
+    }
+    
+    /**
+     * Finds a set of variables that appear in all of the given disjunctions.
+     * 
+     * @param terms A list of {@link Disjunction}s.
+     * 
+     * @return A set of variables that appear in all disjunctions; may be empty.
+     */
+    private @NonNull Set<@NonNull Variable> findVarThatAppearsInAllDisjunctions(@NonNull List<Formula> terms) {
+        Set<@NonNull Variable> result = null;
+        
+        for (Formula term : terms) {
+            List<@NonNull Formula> subTerms = getAllDisjunctionTerms((Disjunction) notNull(term));
+            Set<@NonNull Variable> vars = new HashSet<>(subTerms.size());
+            for (Formula subTerm : subTerms) {
+                if (isVariable(subTerm)) {
+                    vars.add((Variable) subTerm);
+                }
+            }
+            
+            if (result == null) {
+                result = vars;
+            } else {
+                result.retainAll(vars);
+            }
+        }
+        
+        return notNull(result);
+    }
+    
+    /**
+     * Constructs a new list of conjunctions, with all the given variables removed.
+     * 
+     * @param terms The list of conjunctions to remove the variables from.
+     * @param vars The variables to remove from all conjunctions.
+     * 
+     * @return A new list of conjunctions, with all the variables removed.
+     */
+    private @NonNull List<Formula> removeFromAllConjunctions(@NonNull List<Formula> terms,
+            @NonNull Set<@NonNull Variable> vars) {
+        
+        List<Formula> result = new ArrayList<>(terms.size());
+        
+        for (Formula term : terms) {
+            List<@NonNull Formula> subTerms = getAllConjunctionTerms((Conjunction) notNull(term));
+            List<@NonNull Formula> newSubTerms = new ArrayList<>(subTerms.size());
+                    
+            for (Formula subTerm : subTerms) {
+                if (!isVariable(subTerm) || !vars.contains(subTerm)) {
+                    newSubTerms.add(subTerm);
+                }
+            }
+            
+            if (!newSubTerms.isEmpty()) {
+                Formula newSubTerm = notNull(newSubTerms.get(0));
+                for (int i = 1; i < newSubTerms.size(); i++) {
+                    newSubTerm = new Conjunction(newSubTerm, newSubTerms.get(i));
+                }
+                result.add(newSubTerm);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Constructs a new list of disjunctions, with all the given variables removed.
+     * 
+     * @param terms The list of disjunctions to remove the variables from.
+     * @param vars The variables to remove from all disjunctions.
+     * 
+     * @return A new list of disjunctions, with all the variables removed.
+     */
+    private @NonNull List<Formula> removeFromAllDisjunctions(@NonNull List<Formula> terms,
+            @NonNull Set<@NonNull Variable> vars) {
+        
+        List<Formula> result = new ArrayList<>(terms.size());
+        
+        for (Formula term : terms) {
+            List<@NonNull Formula> subTerms = getAllDisjunctionTerms((Disjunction) notNull(term));
+            List<@NonNull Formula> newSubTerms = new ArrayList<>(subTerms.size());
+                    
+            for (Formula subTerm : subTerms) {
+                if (!isVariable(subTerm) || !vars.contains(subTerm)) {
+                    newSubTerms.add(subTerm);
+                }
+            }
+            
+            if (!newSubTerms.isEmpty()) {
+                Formula newSubTerm = notNull(newSubTerms.get(0));
+                for (int i = 1; i < newSubTerms.size(); i++) {
+                    newSubTerm = new Disjunction(newSubTerm, newSubTerms.get(i));
+                }
+                result.add(newSubTerm);
+            }
         }
         
         return result;
