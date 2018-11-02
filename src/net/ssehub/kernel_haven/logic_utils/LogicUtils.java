@@ -115,9 +115,9 @@ public class LogicUtils {
         formula = formula.accept(new FormulaSimplificationVisitor2());
         p.close();
         
-        p = new PerformanceProbe("VisitorSimplifier 2) Library");
-        formula = simplifyWithLibrary(formula);
-        p.close();
+//        p = new PerformanceProbe("VisitorSimplifier 2) Library");
+//        formula = simplifyWithLibrary(formula);
+//        p.close();
         
         return formula;
     }
