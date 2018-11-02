@@ -35,7 +35,16 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 public class AdamsAwesomeSimplifier {
     
-    private static final int NUM_ITERATIONS_SAME = 3;
+    private static final int NUM_ITERATIONS_SAME;
+    
+    static {
+        String setting = System.getProperty("AAS_NUM_ITERATIONS_SAME");
+        if (setting == null) {
+            NUM_ITERATIONS_SAME = 3;
+        } else {
+            NUM_ITERATIONS_SAME = Integer.parseInt(setting);
+        }
+    }
     
     /**
      * Moves all {@link Negation}s inwards as much as possible. After this, negations only occur around
