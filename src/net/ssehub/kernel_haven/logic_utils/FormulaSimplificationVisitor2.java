@@ -201,12 +201,12 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 result = new Disjunction(result, notNull(newTerms.get(i)));
             }
             
-            if (factoredOutvars != null) {
+            if (factoredOutvars != null && !factoredOutvars.isEmpty()) {
                 // 4) add factored-out part
                 for (Variable var : factoredOutvars) {
                     result = new Conjunction(notNull(var), result);
                 }
-                result.accept(this); // do simplification for the re-factored result
+                result = result.accept(this); // do simplification for the re-factored result
             }
         }
         
@@ -332,7 +332,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 result = new Conjunction(result, notNull(newTerms.get(i)));
             }
             
-            if (factoredOutvars != null) {
+            if (factoredOutvars != null && !factoredOutvars.isEmpty()) {
                 // 4) add factored-out part
                 for (Variable var : factoredOutvars) {
                     result = new Disjunction(notNull(var), result);
