@@ -175,7 +175,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 break;
             }
         }
-        Set<@NonNull Variable> factoredOutvars = null;
+        Set<Variable> factoredOutvars = null;
         if (allConjunctions) {
             // 2) find variables that appear in all of the terms
             factoredOutvars = findVarThatAppearsInAllConjunctions(newTerms);
@@ -189,10 +189,10 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         if (newTerms.isEmpty()) {
             // special case: "factoring out" removed all terms completely; only factored out part remains
             // factoredOutvars is not null if all terms have been "factored out"
-            Iterator<@NonNull Variable> it = notNull(factoredOutvars).iterator();
+            Iterator<Variable> it = notNull(factoredOutvars).iterator();
             result = notNull(it.next());
             while (it.hasNext()) {
-                result = new Conjunction(result, it.next());
+                result = new Conjunction(result, notNull(it.next()));
             }
         } else {
             // construct normal disjunction
@@ -204,7 +204,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
             if (factoredOutvars != null) {
                 // 4) add factored-out part
                 for (Variable var : factoredOutvars) {
-                    result = new Conjunction(var, result);
+                    result = new Conjunction(notNull(var), result);
                 }
             }
         }
@@ -305,7 +305,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                 break;
             }
         }
-        Set<@NonNull Variable> factoredOutvars = null;
+        Set<Variable> factoredOutvars = null;
         if (allDisjunctions) {
             // 2) find variables that appear in all of the terms
             factoredOutvars = findVarThatAppearsInAllDisjunctions(newTerms);
@@ -319,10 +319,10 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         if (newTerms.isEmpty()) {
             // special case: "factoring out" removed all terms completely; only factored out part remains
             // factoredOutvars is not null if all terms have been "factored out"
-            Iterator<@NonNull Variable> it = notNull(factoredOutvars).iterator();
+            Iterator<Variable> it = notNull(factoredOutvars).iterator();
             result = notNull(it.next());
             while (it.hasNext()) {
-                result = new Disjunction(result, it.next());
+                result = new Disjunction(result, notNull(it.next()));
             }
         } else {
             // construct normal conjunction
@@ -334,7 +334,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
             if (factoredOutvars != null) {
                 // 4) add factored-out part
                 for (Variable var : factoredOutvars) {
-                    result = new Disjunction(var, result);
+                    result = new Disjunction(notNull(var), result);
                 }
             }
         }
@@ -409,7 +409,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
      * @return A new list of conjunctions, with all the variables removed.
      */
     private @NonNull List<Formula> removeFromAllConjunctions(@NonNull List<Formula> terms,
-            @NonNull Set<@NonNull Variable> vars) {
+            @NonNull Set<Variable> vars) {
         
         List<Formula> result = new ArrayList<>(terms.size());
         
@@ -444,7 +444,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
      * @return A new list of disjunctions, with all the variables removed.
      */
     private @NonNull List<Formula> removeFromAllDisjunctions(@NonNull List<Formula> terms,
-            @NonNull Set<@NonNull Variable> vars) {
+            @NonNull Set<Variable> vars) {
         
         List<Formula> result = new ArrayList<>(terms.size());
         
