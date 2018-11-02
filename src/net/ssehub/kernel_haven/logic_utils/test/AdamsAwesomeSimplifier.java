@@ -229,6 +229,12 @@ public class AdamsAwesomeSimplifier {
         debugPrintFormula(formula, "Step 6: Sub-tree Simplifier");
         p.close();
         
+        // Step 7: sub-tree group simplifier
+        p = new PerformanceProbe("AAS: 7) Sub-Tree Simplifier");
+        formula = SubTreeSimplifier.simplify(formula);
+        debugPrintFormula(formula, "Step 7: Sub-tree Simplifier");
+        p.close();
+        
         return formula;
     }
 
