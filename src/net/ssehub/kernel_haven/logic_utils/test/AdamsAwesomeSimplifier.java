@@ -35,7 +35,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 public class AdamsAwesomeSimplifier {
     
-    private static final int NUM_ITERATIONS_SAME = 2;
+    private static final int NUM_ITERATIONS_SAME = 3;
     
     /**
      * Moves all {@link Negation}s inwards as much as possible. After this, negations only occur around
