@@ -219,20 +219,29 @@ public class AdamsAwesomeSimplifier {
      * @return The simplified formula.
      */
     public static @NonNull Formula simplify(@NonNull Formula formula) {
+        int shortestLength = formula.toString().length();
+        Formula shortest = formula;
+        
         int previousLength;
         int numItersSame = 0;
         do {
             previousLength = formula.toString().length();
             formula = simplifyImpl(formula);
+            int currentLength = formula.toString().length();
             
-            if (previousLength < formula.toString().length()) {
+            if (currentLength < shortestLength) {
+                shortestLength = currentLength;
+                shortest = formula;
+            }
+            
+            if (previousLength < currentLength) {
                 numItersSame = 0;
             } else {
                 numItersSame++;
             }
         } while (numItersSame < NUM_ITERATIONS_SAME);
         
-        return formula;
+        return shortest;
     }
 
 }
