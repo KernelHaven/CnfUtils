@@ -35,7 +35,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 public class AdamsAwesomeSimplifier {
     
-    private static final int NUM_ITERATIONS = 3;
+    private static final int NUM_ITERATIONS_SAME = 2;
     
     /**
      * Moves all {@link Negation}s inwards as much as possible. After this, negations only occur around
@@ -210,9 +210,18 @@ public class AdamsAwesomeSimplifier {
      * @return The simplified formula.
      */
     public static @NonNull Formula simplify(@NonNull Formula formula) {
-        for (int i = 0; i < NUM_ITERATIONS; i++) {
+        int previousLength;
+        int numItersSame = 0;
+        do {
+            previousLength = formula.toString().length();
             formula = simplifyImpl(formula);
-        }
+            
+            if (previousLength < formula.toString().length()) {
+                numItersSame = 0;
+            } else {
+                numItersSame++;
+            }
+        } while (numItersSame < NUM_ITERATIONS_SAME);
         
         return formula;
     }
