@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.ssehub.kernel_haven.logic_utils.LogicUtils;
+import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
@@ -34,6 +35,8 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  * @author Adam
  */
 public class AdamsAwesomeSimplifier {
+    
+    private static final int MAX_ITERATIONS = 10;
     
     /**
      * Moves all {@link Negation}s inwards as much as possible. After this, negations only occur around
@@ -208,8 +211,17 @@ public class AdamsAwesomeSimplifier {
      * @return The simplified formula.
      */
     public static @NonNull Formula simplify(@NonNull Formula formula) {
-        formula = simplifyImpl(formula);
-        formula = simplifyImpl(formula);
+        int iteration = 0;
+        int previousLength;
+        do {
+            previousLength = formula.toString().length();
+            formula = simplifyImpl(formula);
+        } while (++iteration < MAX_ITERATIONS && formula.toString().length() < previousLength);
+        
+        if (iteration >= MAX_ITERATIONS) {
+            Logger.get().logWarning("Stopped simplifiying after " + MAX_ITERATIONS + " iterations");
+        }
+        
         return formula;
     }
 
