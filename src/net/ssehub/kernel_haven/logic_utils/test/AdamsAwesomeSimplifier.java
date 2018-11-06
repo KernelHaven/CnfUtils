@@ -234,7 +234,7 @@ public class AdamsAwesomeSimplifier {
                 shortest = formula;
             }
             
-            if (previousLength < currentLength) {
+            if (previousLength <= currentLength) {
                 numItersSame++;
             } else {
                 numItersSame = 0;
