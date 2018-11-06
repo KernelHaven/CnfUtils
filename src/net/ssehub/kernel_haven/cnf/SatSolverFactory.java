@@ -47,6 +47,8 @@ public class SatSolverFactory {
     public static void initialize(@NonNull Configuration config) throws SetUpException {
         config.registerSetting(SOLVER_SETTING);
         configuredType = config.getValue(SOLVER_SETTING);
+
+        Logger.get().logDebug2("Creating SAT solvers of type ", configuredType);
     }
     
     /**
@@ -107,8 +109,6 @@ public class SatSolverFactory {
     public static @NonNull ISatSolver createSolver(@NonNull SolverType type, @Nullable Cnf cnf, boolean cached) {
         
         ISatSolver result;
-        
-        Logger.get().logDebug2("Creating SAT solver of type ", type);
         
         switch (type) {
         
