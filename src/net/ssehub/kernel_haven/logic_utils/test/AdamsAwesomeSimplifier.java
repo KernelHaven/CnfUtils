@@ -235,9 +235,9 @@ public class AdamsAwesomeSimplifier {
             }
             
             if (previousLength < currentLength) {
-                numItersSame = 0;
-            } else {
                 numItersSame++;
+            } else {
+                numItersSame = 0;
             }
         } while (numItersSame < NUM_ITERATIONS_SAME);
         
