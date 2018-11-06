@@ -1,13 +1,12 @@
-package net.ssehub.kernel_haven.logic_utils.test;
+package net.ssehub.kernel_haven.logic_utils;
 
-import static net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker.isStructurallyEqual;
+import static net.ssehub.kernel_haven.logic_utils.FormulaStructureChecker.isStructurallyEqual;
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ssehub.kernel_haven.logic_utils.FormulaSimplificationVisitor2;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;

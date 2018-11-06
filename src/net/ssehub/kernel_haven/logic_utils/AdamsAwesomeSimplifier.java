@@ -1,4 +1,4 @@
-package net.ssehub.kernel_haven.logic_utils.test;
+package net.ssehub.kernel_haven.logic_utils;
 
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.and;
 import static net.ssehub.kernel_haven.util.logic.FormulaBuilder.not;
@@ -8,7 +8,6 @@ import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ssehub.kernel_haven.logic_utils.LogicUtils;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;

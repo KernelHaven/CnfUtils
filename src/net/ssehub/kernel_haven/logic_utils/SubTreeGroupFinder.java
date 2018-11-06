@@ -1,4 +1,4 @@
-package net.ssehub.kernel_haven.logic_utils.test;
+package net.ssehub.kernel_haven.logic_utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;

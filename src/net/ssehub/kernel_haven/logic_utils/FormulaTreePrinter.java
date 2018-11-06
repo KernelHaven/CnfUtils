@@ -1,4 +1,4 @@
-package net.ssehub.kernel_haven.logic_utils.test;
+package net.ssehub.kernel_haven.logic_utils;
 
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 

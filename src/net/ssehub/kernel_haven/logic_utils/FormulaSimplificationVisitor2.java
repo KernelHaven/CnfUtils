@@ -1,7 +1,7 @@
 package net.ssehub.kernel_haven.logic_utils;
 
-import static net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker.getAllConjunctionTerms;
-import static net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker.getAllDisjunctionTerms;
+import static net.ssehub.kernel_haven.logic_utils.FormulaStructureChecker.getAllConjunctionTerms;
+import static net.ssehub.kernel_haven.logic_utils.FormulaStructureChecker.getAllDisjunctionTerms;
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import java.util.ArrayList;
@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.False;

@@ -8,7 +8,6 @@ import com.bpodgursky.jbool_expressions.rules.RuleSet;
 import net.ssehub.kernel_haven.SetUpException;
 import net.ssehub.kernel_haven.config.Configuration;
 import net.ssehub.kernel_haven.config.EnumSetting;
-import net.ssehub.kernel_haven.logic_utils.test.AdamsAwesomeSimplifier;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
