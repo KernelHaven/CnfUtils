@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.ssehub.kernel_haven.logic_utils.LogicUtils;
+import net.ssehub.kernel_haven.logic_utils.FormulaSimplificationVisitor2;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
@@ -136,7 +136,7 @@ public class SubTreeSimplifier {
                 p.close();
                 
                 p = new PerformanceProbe("SubTreeSimplifier 2.2) Simplify");
-                Formula withReplSimpl = LogicUtils.simplifyWithVisitor(withRepl);
+                Formula withReplSimpl = new FormulaSimplificationVisitor2().visit(withRepl);
                 p.close();
 
                 p = new PerformanceProbe("SubTreeSimplifier 2.3) Check");

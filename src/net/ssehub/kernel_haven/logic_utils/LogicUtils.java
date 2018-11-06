@@ -2,10 +2,6 @@ package net.ssehub.kernel_haven.logic_utils;
 
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
 import com.bpodgursky.jbool_expressions.Expression;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 
@@ -13,11 +9,9 @@ import net.ssehub.kernel_haven.SetUpException;
 import net.ssehub.kernel_haven.config.Configuration;
 import net.ssehub.kernel_haven.config.EnumSetting;
 import net.ssehub.kernel_haven.logic_utils.test.AdamsAwesomeSimplifier;
-import net.ssehub.kernel_haven.logic_utils.test.FormulaStructureChecker;
 import net.ssehub.kernel_haven.util.FormatException;
 import net.ssehub.kernel_haven.util.Logger;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
-import net.ssehub.kernel_haven.util.io.csv.CsvWriter;
 import net.ssehub.kernel_haven.util.logic.Formula;
 import net.ssehub.kernel_haven.util.logic.FormulaSimplifier;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
@@ -53,8 +47,7 @@ public class LogicUtils {
         LIBRARY,
         
         /**
-         * Use the <a href="https://github.com/bpodgursky/jbool_expressions">jbool_expressions</a> and
-         * {@link FormulaSimplificationVisitor}.
+         * Use the {@link FormulaSimplificationVisitor}.
          */
         VISITOR,
         
@@ -117,28 +110,9 @@ public class LogicUtils {
     public static @NonNull Formula simplifyWithVisitor(@NonNull Formula formula) {
         PerformanceProbe p;
         
-        p = new PerformanceProbe("VisitorSimplifier 1) Visitor");
-        formula = formula.accept(new FormulaSimplificationVisitor2());
+        p = new PerformanceProbe("VisitorSimplifier");
+        formula = formula.accept(new FormulaSimplificationVisitor());
         p.close();
-        
-        
-        if (Boolean.parseBoolean(System.getProperty("DEBUG_COMPARE_TO_LIB"))) {
-            Formula lib = simplifyWithLibrary(formula);
-            if (!FormulaStructureChecker.isStructurallyEqual(formula, lib)) {
-                synchronized (LogicUtils.class) {
-                    try (CsvWriter out = new CsvWriter(new FileOutputStream(
-                            new File("further_simplifications.csv"), true))) {
-                        out.writeRow(formula, lib);
-                    } catch (IOException e) {
-                        // ignore
-                    }
-                }
-            }
-        }
-        
-//        p = new PerformanceProbe("VisitorSimplifier 2) Library");
-//        formula = simplifyWithLibrary(formula);
-//        p.close();
         
         return formula;
     }
