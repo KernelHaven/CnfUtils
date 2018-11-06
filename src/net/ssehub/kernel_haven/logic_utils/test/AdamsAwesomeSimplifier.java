@@ -212,9 +212,9 @@ public class AdamsAwesomeSimplifier {
         Formula shortest = formula;
         
         int previousLength;
-        int currentLength;
+        int currentLength = formula.toString().length();
         do {
-            previousLength = formula.toString().length();
+            previousLength = currentLength;
             formula = simplifyImpl(formula);
             currentLength = formula.toString().length();
             
