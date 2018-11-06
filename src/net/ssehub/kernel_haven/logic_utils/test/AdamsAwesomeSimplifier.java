@@ -35,17 +35,6 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 public class AdamsAwesomeSimplifier {
     
-    private static final int NUM_ITERATIONS_SAME;
-    
-    static {
-        String setting = System.getProperty("AAS_NUM_ITERATIONS_SAME");
-        if (setting == null) {
-            NUM_ITERATIONS_SAME = 3;
-        } else {
-            NUM_ITERATIONS_SAME = Integer.parseInt(setting);
-        }
-    }
-    
     /**
      * Moves all {@link Negation}s inwards as much as possible. After this, negations only occur around
      * {@link Variable}s, {@link True} and {@link False}.
@@ -223,23 +212,18 @@ public class AdamsAwesomeSimplifier {
         Formula shortest = formula;
         
         int previousLength;
-        int numItersSame = 0;
+        int currentLength;
         do {
             previousLength = formula.toString().length();
             formula = simplifyImpl(formula);
-            int currentLength = formula.toString().length();
+            currentLength = formula.toString().length();
             
             if (currentLength < shortestLength) {
                 shortestLength = currentLength;
                 shortest = formula;
             }
-            
-            if (previousLength <= currentLength) {
-                numItersSame++;
-            } else {
-                numItersSame = 0;
-            }
-        } while (numItersSame < NUM_ITERATIONS_SAME);
+
+        } while (currentLength < previousLength);
         
         return shortest;
     }
