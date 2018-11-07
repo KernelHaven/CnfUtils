@@ -28,6 +28,12 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
 public class SubTreeSimplifier {
 
     private static final int MAX_ITERATIONS = 50;
+
+    /**
+     * Don't allow any instances.
+     */
+    private SubTreeSimplifier() {
+    }
     
     /**
      * Replaces all elements in toReplace found in formula with replacement.
@@ -127,7 +133,7 @@ public class SubTreeSimplifier {
             p.close();
 
             PerformanceProbe p2 = new PerformanceProbe("SubTreeSimplifier 2) Replacing & Simplifying");
-            Variable replacement = new Variable("TMP_REPLACE");
+            Variable replacement = new Variable("__TMP_REPLACE__");
             for (List<@NonNull Formula> subTreeList : trees) {
 
                 p = new PerformanceProbe("SubTreeSimplifier 2.1) Replace");

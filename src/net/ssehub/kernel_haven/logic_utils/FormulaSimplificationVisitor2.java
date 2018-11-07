@@ -6,7 +6,6 @@ import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -41,7 +40,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  * @author El-Sharkawy
  */
 public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull Formula> {
-
+    
     @Override
     public Formula visitFalse(@NonNull False falseConstant) {
         return falseConstant;
@@ -87,6 +86,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     @Override
     public Formula visitDisjunction(@NonNull Disjunction formula) {
     // CHECKSTYLE:ON
+        
         List<Formula> terms = new ArrayList<>();
         
         AtomicBoolean containsTrue = new AtomicBoolean(false);
@@ -185,28 +185,19 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         }
         
         Formula result;
-        if (newTerms.isEmpty()) {
-            // special case: "factoring out" removed all terms completely; only factored out part remains
-            // factoredOutvars is not null if all terms have been "factored out"
-            Iterator<Variable> it = notNull(factoredOutvars).iterator();
-            result = notNull(it.next());
-            while (it.hasNext()) {
-                result = new Conjunction(result, notNull(it.next()));
+        // construct normal disjunction
+        // newTerms can't be empty
+        result = notNull(newTerms.get(0));
+        for (int i = 1; i < newTerms.size(); i++) {
+            result = new Disjunction(result, notNull(newTerms.get(i)));
+        }
+        
+        if (factoredOutvars != null && !factoredOutvars.isEmpty()) {
+            // 4) add factored-out part
+            for (Variable var : factoredOutvars) {
+                result = new Conjunction(notNull(var), result);
             }
-        } else {
-            // construct normal disjunction
-            result = notNull(newTerms.get(0));
-            for (int i = 1; i < newTerms.size(); i++) {
-                result = new Disjunction(result, notNull(newTerms.get(i)));
-            }
-            
-            if (factoredOutvars != null && !factoredOutvars.isEmpty()) {
-                // 4) add factored-out part
-                for (Variable var : factoredOutvars) {
-                    result = new Conjunction(notNull(var), result);
-                }
-                result = result.accept(this); // do simplification for the re-factored result
-            }
+            result = result.accept(this); // do simplification for the re-factored result
         }
         
         return result;
@@ -216,6 +207,7 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
     @Override
     public Formula visitConjunction(@NonNull Conjunction formula) {
     // CHECKSTYLE:ON
+        
         List<Formula> terms = new ArrayList<>();
         
         AtomicBoolean containsFalse = new AtomicBoolean(false);
@@ -316,28 +308,19 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
         }
         
         Formula result;
-        if (newTerms.isEmpty()) {
-            // special case: "factoring out" removed all terms completely; only factored out part remains
-            // factoredOutvars is not null if all terms have been "factored out"
-            Iterator<Variable> it = notNull(factoredOutvars).iterator();
-            result = notNull(it.next());
-            while (it.hasNext()) {
-                result = new Disjunction(result, notNull(it.next()));
+        // construct normal conjunction
+        // newTerms can't be empty
+        result = notNull(newTerms.get(0));
+        for (int i = 1; i < newTerms.size(); i++) {
+            result = new Conjunction(result, notNull(newTerms.get(i)));
+        }
+        
+        if (factoredOutvars != null && !factoredOutvars.isEmpty()) {
+            // 4) add factored-out part
+            for (Variable var : factoredOutvars) {
+                result = new Disjunction(notNull(var), result);
             }
-        } else {
-            // construct normal conjunction
-            result = notNull(newTerms.get(0));
-            for (int i = 1; i < newTerms.size(); i++) {
-                result = new Conjunction(result, notNull(newTerms.get(i)));
-            }
-            
-            if (factoredOutvars != null && !factoredOutvars.isEmpty()) {
-                // 4) add factored-out part
-                for (Variable var : factoredOutvars) {
-                    result = new Disjunction(notNull(var), result);
-                }
-                result = result.accept(this); // do simplification for the re-factored result
-            }
+            result = result.accept(this); // do simplification for the re-factored result
         }
         
         return result;
@@ -430,6 +413,9 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                     newSubTerm = new Conjunction(newSubTerm, newSubTerms.get(i));
                 }
                 result.add(newSubTerm);
+            } else {
+                // all variables were removed, add True (A == A && true)
+                result.add(True.INSTANCE);
             }
         }
         
@@ -465,6 +451,9 @@ public class FormulaSimplificationVisitor2 implements IFormulaVisitor<@NonNull F
                     newSubTerm = new Disjunction(newSubTerm, newSubTerms.get(i));
                 }
                 result.add(newSubTerm);
+            } else {
+                // all variables were removed, add False -> (A == A || 0)
+                result.add(False.INSTANCE);
             }
         }
         

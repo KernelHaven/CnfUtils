@@ -80,7 +80,8 @@ public class FormulaSimplificationVisitor2Test {
             {and(or("A", or("B", "C")), not("A")), and(or("C", "B"), not("A")), "Negated Variable Absorption Multiple \u2227"},
             {and(or("A", "B"), or("A", "C")), or("A", and("B", "C")), "Factoring out \u2227"},
             {and(or("A", or("B", "D")), or("A", "C")), or("A", and(or("D", "B"), "C")), "Factoring out larger \u2227"},
-            {and(or("A", "C"), or("A", "C")), or("A", "C"), "Factoring out same \u2227"},
+            {and(or("A", "C"), or("A", "C")), or("C", "A"), "Factoring out same \u2227"},
+            {or(and("A", and("B", "C")), and("A", "B")), and("B", "A"), "Factoring out whole term \u2227"},
             
             {and(not("A"), not(and(not("C"), "B"))), and(not("A"), not(and(not("C"), "B"))), "No Rule Applies \u2227"},
             {and(not(and(not("C"), "B")), not("A")), and(not(and(not("C"), "B")), not("A")), "No Rule Applies \u2227"},
@@ -108,7 +109,8 @@ public class FormulaSimplificationVisitor2Test {
             {or(and("A", and("B", "C")), not("A")), or(and("C", "B"), not("A")), "Negated Variable Absorption Multiple \u2228"},
             {or(and("A", "B"), and("A", "C")), and("A", or("B", "C")), "Factoring out \u2228"},
             {or(and("A", and("B", "D")), and("A", "C")), and("A", or(and("D", "B"), "C")), "Factoring out larger \u2228"},
-            {or(and("A", "C"), and("A", "C")), and("A", "C"), "Factoring out same \u2228"},
+            {or(and("A", "C"), and("A", "C")), and("C", "A"), "Factoring out same \u2228"},
+            {and(or("A", or("B", "C")), or("A", "B")), or("B", "A"), "Factoring out whole term \u2228"},
             
             {or(not("A"), not(or(not("C"), "B"))), or(not("A"), not(or(not("C"), "B"))), "No Rule Applies \u2228"},
             {or(not(or(not("C"), "B")), not("A")), or(not(or(not("C"), "B")), not("A")), "No Rule Applies \u2228"},
@@ -125,7 +127,6 @@ public class FormulaSimplificationVisitor2Test {
             {or("A", or(and("C", or("D", "E")), and("A", "B"))), or("A", and("C", or("D", "E"))), "Complex Absorbtion"},
             {or(or(or("D", "E"), "F"), "D"), or(or("D", "F"), "E"), "Unbalanced OR-Tree"},
             {and(or(and("A", "B"), "C"), or(or("D", "E"), or("F", "D"))),  and(or(and("A", "B"), "C"), or(or("D", "E"), "F")), "Complex keeps (almost) same"},
-            
         });
     }
     // CHECKSTYLE:ON
