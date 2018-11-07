@@ -17,11 +17,14 @@ import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
+ * <p>
  * A utility class for finding groups of equal sub-trees in a {@link Formula}. Sub-trees are all {@link Formula}s
  * that are not simple {@link Variable}s, {@link True} or {@link False}. The formula itself is considered to be a
  * sub-tree, too. 
- * 
+ * </p>
+ * <p>
  * This class is not thread safe.
+ * </p>
  *
  * @author Adam
  */

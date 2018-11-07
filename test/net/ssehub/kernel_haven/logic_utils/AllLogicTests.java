@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
     FormulaTreePrinterTest.class,
     FormulaStructureCheckerTest.class,
     FormulaStructureCheckerTermSplitTest.class,
+    SubTreeGroupFinderTest.class,
     })
 public class AllLogicTests {
 
