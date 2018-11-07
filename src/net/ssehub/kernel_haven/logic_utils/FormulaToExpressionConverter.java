@@ -108,7 +108,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<@NonNull Expressio
      */
     private @NonNull Formula translateOrExpression(@NonNull Or<String> expr) throws FormatException {
         Formula result;
-        @SuppressWarnings("null") // childreen are never null
+        @SuppressWarnings("null") // children are never null
         List<@NonNull Expression<String>> children = expr.getChildren();
         if (children.size() < 1) {
             result = True.INSTANCE;
@@ -155,7 +155,7 @@ class FormulaToExpressionConverter implements IFormulaVisitor<@NonNull Expressio
      */
     private @NonNull Formula translateAndExpression(@NonNull And<String> expr) throws FormatException {
         Formula result;
-        @SuppressWarnings("null") // childreen are never null
+        @SuppressWarnings("null") // children are never null
         List<@NonNull Expression<String>> children = expr.getChildren();
         if (children.size() < 1) {
             result = True.INSTANCE;
