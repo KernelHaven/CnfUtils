@@ -34,6 +34,12 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
 public class FormulaStructureChecker {
 
     /**
+     * Don't allow any instances.
+     */
+    private FormulaStructureChecker() {
+    }
+
+    /**
      * Checks if the two given {@link Formula}s are structurally equal.
      * 
      * @param f1 The first formula.

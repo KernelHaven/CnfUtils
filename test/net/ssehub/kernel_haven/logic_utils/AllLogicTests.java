@@ -16,6 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
     FormulaSimplificationVisitor2Test.class,
     FormulaEqualityCheckerTest.class,
     FormulaTreePrinterTest.class,
+    FormulaStructureCheckerTest.class,
+    FormulaStructureCheckerTermSplitTest.class,
     })
 public class AllLogicTests {
 
