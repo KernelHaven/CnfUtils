@@ -210,9 +210,13 @@ public class AdamsAwesomeSimplifier {
         int shortestLength = formula.toString().length();
         Formula shortest = formula;
         
+        int iteration = 0;
+        
         int previousLength;
         int currentLength = formula.toString().length();
         do {
+            PerformanceProbe p = new PerformanceProbe("AAS iteration " + (++iteration));
+            
             previousLength = currentLength;
             formula = simplifyImpl(formula);
             currentLength = formula.toString().length();
@@ -222,6 +226,8 @@ public class AdamsAwesomeSimplifier {
                 shortest = formula;
             }
 
+            p.addExtraData("Relative length", (double) currentLength / previousLength);
+            p.close();
         } while (currentLength < previousLength);
         
         return shortest;
