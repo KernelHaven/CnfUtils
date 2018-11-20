@@ -11,6 +11,7 @@ import net.ssehub.kernel_haven.cnf.IFormulaToCnfConverter;
 import net.ssehub.kernel_haven.cnf.ISatSolver;
 import net.ssehub.kernel_haven.cnf.SatSolverFactory;
 import net.ssehub.kernel_haven.cnf.SolverException;
+import net.ssehub.kernel_haven.util.PerformanceProbe;
 import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.DisjunctionQueue;
@@ -47,6 +48,7 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
     @Override
     public @NonNull Formula getDisjunction(@Nullable String varName) {
         Formula result;
+        PerformanceProbe full = new PerformanceProbe("SimplifyingDisjunctionQueue.getDisjunction");
         
         // Create disjunction of all elements
         if (isTrue) {
@@ -61,51 +63,9 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
             helperQueue.add(previous);
             
             for (Formula current : queue) {
-                IRelevancyType relevancy;
-                try {
-                    relevancy = checkRelevancy(previous, current);
-                } catch (ConverterException | SolverException e) {
-                    if (null != varName) {
-                        LOGGER.logExceptionWarning("Error while creating disjunction for conditions of " + varName, e);
-                    } else {
-                        LOGGER.logExceptionWarning("Error while creating disjunction", e);
-                    }
-                    // consider both, to be safe
-                    relevancy = RelevancyType.BOTH_RELEVANT;
-                }
-                
-                if (relevancy instanceof RelevancyType) {
-                    switch ((RelevancyType) relevancy) {
-                    case PREVIOUS_RELEVANT:
-                        // consider only previous; current is ignored (do nothing)
-                        break;
-                        
-                    case CURRENT_RELEVANT:
-                        // consider only current; previous is overridden
-                        previous = current;
-                        helperQueue.reset();
-                        helperQueue.add(current);
-                        break;
-                        
-                    case BOTH_RELEVANT:
-                        // add current
-                        previous = new Disjunction(previous, current);
-                        helperQueue.add(current);
-                        break;
-                        
-                    default:
-                        throw new RuntimeException("Invalid relevancy: " + relevancy); // can't happen
-                    }
-                } else if (relevancy instanceof SubRelevance) {
-                    // add sub formula of current
-                    SubRelevance subRelevance = (SubRelevance) relevancy;
-                    Formula relevantPart = subRelevance.relevantSubFormula;
-                    previous = new Disjunction(previous, relevantPart);
-                    helperQueue.add(relevantPart);
-                } else {
-                    // can't happen
-                    throw new RuntimeException("Invalid relevancy class: " + relevancy.getClass().getCanonicalName());
-                }
+                PerformanceProbe p = new PerformanceProbe("SimplifyingDisjunctionQueue.getDisjunction SingleElement");
+                previous = addIfRelevant(varName, current, previous, helperQueue);
+                p.close();
             }
             
             result = helperQueue.getDisjunction(varName);
@@ -113,7 +73,74 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         
         // Reset
         reset();
+        full.close();
         return result;
+    }
+
+    /**
+     * Adds the given current formula to the given disjunction queue, if it is relevant. (may also clear the disjunction
+     * queue if only the current formula is relevant).
+     * 
+     * @param varName Optional: The name of the variable for which the disjunction is currently be created, this is
+     *      only used to create an error log in case of an error.
+     * @param current The new formula to (possibly) add to the queue.
+     * @param previous The previous formula stored in the queue (all previously considered formulas ORd together).
+     * @param helperQueue The queue to add the formula to.
+     * 
+     * @return The new "previous" formula. Pass this to the next call of this method.
+     */
+    private @NonNull Formula addIfRelevant(@Nullable String varName, @NonNull Formula current,
+            @NonNull Formula previous, @NonNull DisjunctionQueue helperQueue) {
+        
+        IRelevancyType relevancy;
+        try {
+            relevancy = checkRelevancy(previous, current);
+        } catch (ConverterException | SolverException e) {
+            if (null != varName) {
+                LOGGER.logExceptionWarning("Error while creating disjunction for conditions of " + varName, e);
+            } else {
+                LOGGER.logExceptionWarning("Error while creating disjunction", e);
+            }
+            // consider both, to be safe
+            relevancy = RelevancyType.BOTH_RELEVANT;
+        }
+        
+        if (relevancy instanceof RelevancyType) {
+            switch ((RelevancyType) relevancy) {
+            case PREVIOUS_RELEVANT:
+                // consider only previous; current is ignored (do nothing)
+                break;
+                
+            case CURRENT_RELEVANT:
+                // consider only current; previous is overridden
+                previous = current;
+                helperQueue.reset();
+                helperQueue.add(current);
+                break;
+                
+            case BOTH_RELEVANT:
+                // add current
+                previous = new Disjunction(previous, current);
+                helperQueue.add(current);
+                break;
+                
+            default:
+                throw new RuntimeException("Invalid relevancy: " + relevancy); // can't happen
+            }
+            
+        } else if (relevancy instanceof SubRelevance) {
+            // add sub formula of current
+            SubRelevance subRelevance = (SubRelevance) relevancy;
+            Formula relevantPart = subRelevance.relevantSubFormula;
+            previous = new Disjunction(previous, relevantPart);
+            helperQueue.add(relevantPart);
+            
+        } else {
+            // can't happen
+            throw new RuntimeException("Invalid relevancy class: " + relevancy.getClass().getCanonicalName());
+        }
+        
+        return previous;
     }
     
     /**
