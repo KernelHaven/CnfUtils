@@ -1,7 +1,6 @@
 package net.ssehub.kernel_haven.cnf;
 
 import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNull;
-import static net.ssehub.kernel_haven.util.null_checks.NullHelpers.notNullArrayWithNotNullContent;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -130,7 +129,9 @@ public class VmToCnfConverter {
             int maxNumber, int currentLineNumber) throws FormatException {
         
         String[] dimacsModelLine = line.split(ROW_DELIMITER);
-        CnfVariable[] cnfRow = new CnfVariable[dimacsModelLine.length - 1];
+        // the loop makes sure that every entry is filled with non null
+        @NonNull CnfVariable[] cnfRow = new  @NonNull CnfVariable[dimacsModelLine.length - 1];
+        
         for (int i = 0; i < dimacsModelLine.length - 1; i++) {
             int dimacsNumber = Integer.parseInt(dimacsModelLine[i]);
             int absolutDimacsNumber = Math.abs(dimacsNumber);
@@ -146,10 +147,9 @@ public class VmToCnfConverter {
             } else {
                 cnfRow[i] = new CnfVariable(isNot, notNull(vmMap.get(absolutDimacsNumber)));
             }
-            
-            
         }
-        return notNullArrayWithNotNullContent(cnfRow); // the loop makes sure that every entry is filled with non null
+        
+        return cnfRow; 
     }
     
 
