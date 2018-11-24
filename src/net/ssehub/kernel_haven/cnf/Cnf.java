@@ -202,7 +202,7 @@ public class Cnf {
     
     @Override
     public @NonNull String toString() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         
         for (List<CnfVariable> row : table) {
             result.append(row).append("\n");
