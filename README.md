@@ -20,7 +20,7 @@ This plugin is licensed under the [Apache License 2.0](https://www.apache.org/li
 
 ## Used Libraries
 
-The following libraries are used by this plugin:
+The following libraries are used (and bundled in `lib/`) by this plugin:
 
 | Library | Version | License |
 |---------|---------|---------|
