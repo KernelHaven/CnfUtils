@@ -7,9 +7,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/KernelHaven"/>
 	<classpathentry kind="lib" path="lib/include/sat4j-core-2.3.5.jar" sourcepath="lib/org.ow2.sat4j.core-2.3.5-sources.zip"/>
-	<classpathentry kind="lib" path="lib/include/commons-lang-2.5.jar"/>
-	<classpathentry kind="lib" path="lib/include/commons-lang3-3.6.jar"/>
-	<classpathentry kind="lib" path="lib/include/guava-14.0.jar"/>
-	<classpathentry kind="lib" path="lib/include/jbool_expressions-1.13.jar" sourcepath="lib/jbool_expressions-jbool_expressions-1.13.zip"/>
+	<classpathentry kind="lib" path="lib/include/antlr-runtime-3.5.2.jar"/>
+	<classpathentry kind="lib" path="lib/include/jbool_expressions-1.21.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
