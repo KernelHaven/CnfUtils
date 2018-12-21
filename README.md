@@ -17,3 +17,13 @@ This plugin has no additional dependencies other than KernelHaven.
 ## License
 
 This plugin is licensed under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html).
+
+## Used Libraries
+
+The following libraries are used by this plugin:
+
+| Library | Version | License |
+|---------|---------|---------|
+| [Sat4j](https://www.sat4j.org/) | [2.3.5.v20130525](http://download.forge.ow2.org/sat4j/sat4j-core-v20130525.zip) | [EPL](https://www.eclipse.org/legal/epl-v10.html) or [LGPL](https://www.gnu.org/licenses/lgpl.html) |
+| [jbool_expressions](https://github.com/bpodgursky/jbool_expressions) | [1.21](https://mvnrepository.com/artifact/com.bpodgursky/jbool_expressions/1.21) | [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html) |
+| [ANTLR v3 Runtime](https://www.antlr3.org/download.html) | [3.5.2](https://mvnrepository.com/artifact/org.antlr/antlr-runtime/3.5.2) | [BSD License](https://www.antlr.org/license.html) |
