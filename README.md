@@ -1,6 +1,6 @@
 # CnfUtils
 
-![Build Status](https://jenkins.sse.uni-hildesheim.de/buildStatus/icon?job=KernelHaven_CnfUtils)
+![Build Status](https://jenkins-2.sse.uni-hildesheim.de/buildStatus/icon?job=KH_CnfUtils)
 
 A utility plugin for [KernelHaven](https://github.com/KernelHaven/KernelHaven).
 
