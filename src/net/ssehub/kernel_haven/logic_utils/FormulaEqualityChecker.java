@@ -51,7 +51,7 @@ public class FormulaEqualityChecker {
     
     /**
      * Checks if the two given {@link Formula}s are logically equal. They are equal iff
-     * <code>sat((f1 && !f2) || (!f1 && f2)) = false</code>.
+     * {@code sat((f1 && !f2) || (!f1 && f2)) = false}.
      * 
      * @param f1 The first formula.
      * @param f2 The second formula.

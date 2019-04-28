@@ -31,9 +31,7 @@ import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
- * <p>
  * Tests if two {@link Formula}s are structurally equal.
- * </p>
  * <p>
  * The following examples are structurally equal formulas that are detected by this checker:
  * <ul>
@@ -42,7 +40,6 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  *      <li><code>A || (B || C)</code> equals <code>(B || A) || C</code> (nesting structure and order  may be changed)
  *      </li>
  * </ul>
- * </p>
  * 
  * @author Adam
  */
@@ -84,7 +81,7 @@ public class FormulaStructureChecker {
     /**
      * Creates a list of all terms that are in the given {@link Disjunction}. This also considers further
      * {@link Disjunction}s that are nested elements of the given {@link Disjunction}. E.g., the formula
-     * <code>(A || B) || (C && D)</code> will return the list <code>[A, B, C && D]</code>.
+     * {@code (A || B) || (C && D)} will return the list {@code [A, B, C && D]}.
      * 
      * @param dis The disjunction to get all terms of (including child {@link Disjunction}s).
      * 
@@ -180,7 +177,7 @@ public class FormulaStructureChecker {
     /**
      * Creates a list of all terms that are in the given {@link Conjunction}. This also considers further
      * {@link Conjunction}s that are nested elements of the given {@link Conjunction}. E.g., the formula
-     * <code>(A && B) && (C || D)</code> will return the list <code>[A, B, C || D]</code>.
+     * {@code (A && B) && (C || D)} will return the list {@code [A, B, C || D]}.
      * 
      * @param con The conjunction to get all terms of (including child {@link Conjunction}s).
      * 

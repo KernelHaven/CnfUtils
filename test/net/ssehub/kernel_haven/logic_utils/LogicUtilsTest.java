@@ -94,8 +94,8 @@ public class LogicUtilsTest {
     }
     
     /**
-     * Tests that the simplification for the formula A || (some complicated middle part) || (A && B) correctly drops
-     * the last part.
+     * Tests that the simplification for the formula {@code A || (some complicated middle part) || (A && B)} correctly
+     * drops the last part.
      */
     @Test
     public void testComplicatedMiddlePart() {

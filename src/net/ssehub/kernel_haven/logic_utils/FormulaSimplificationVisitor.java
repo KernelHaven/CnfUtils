@@ -28,8 +28,8 @@ import net.ssehub.kernel_haven.util.null_checks.Nullable;
 
 /**
  * Creates a more concise formula based on the visited input formula.
- * If the formula cannot be simplified, the same instance is returned. <br/><br/>
- * 
+ * If the formula cannot be simplified, the same instance is returned.
+ * <p>
  * Applies rules of the <a href="https://en.wikipedia.org/wiki/Boolean_algebra#Laws">Boolean algebra</a> and
  * combinations of these rules.
  * 
