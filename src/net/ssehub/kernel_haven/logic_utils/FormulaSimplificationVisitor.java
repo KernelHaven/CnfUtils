@@ -243,13 +243,13 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
 
     /**
      * Checks and resolves a negated AND absorption.
-     * Does the following transformations:<br/>
-     * <pre><code>   !A &and; !(A &and; B)
+     * Does the following transformations:
+     * <pre>   !A &and; !(A &and; B)
      * &rarr; !(A &or; (A &and; B))
      * &rarr; !((A &and; A) &or; (A &and; B))
      * &rarr; !(A &or; (A &and; B))
      * &rarr; !(A)
-     * &rarr; !A</code></pre>
+     * &rarr; !A</pre>
      * 
      * @param negatedVar The negated variable (<tt>!A</tt> in the example).
      * @param unpackedVar The variable without the negation (<tt>A</tt> in the example).
@@ -271,11 +271,11 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
     
     /**
      * Checks and resolves a negated AND complementation, identity, De Morgan.
-     * Does the following transformations:<br/>
-     * <pre><code>   !A &and; !(!A &and; B)
+     * Does the following transformations:
+     * <pre>   !A &and; !(!A &and; B)
      * &rarr; !A &and; (A &or; !B)          | De Morgan, Double Negation
      * &rarr; (!A &and; A) &or; (!A &and; !B)   | Distribution
-     * &rarr; (!A &and; !B)              | Complementation, Identity &or;</code></pre>
+     * &rarr; (!A &and; !B)              | Complementation, Identity &or;</pre>
      *
      * @param negatedVar The negated variable (<tt>!A</tt> in the example).
      * @param negatedConjunction The conjunction to test (<tt>!(!A &and; B)</tt> in the example).
@@ -354,11 +354,11 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
     }
     
     /**
-     * Tests and simplifies a nested and-absorption inside a conjunction. Will simplify<br/>
-     * <tt>A &and; (X &and; (A &or; B)</tt> to <tt>A &and; X</tt>
+     * Tests and simplifies a nested and-absorption inside a conjunction. Will simplify
+     * <code>A &and; (X &and; (A &or; B)</code> to <code>A &and; X</code>
      * @param var The variable of a disjunction.
      * @param conjunction The conjunction to test (right side of the example).
-     * @return The simplified structure or <tt>null</tt> if the absorption rule could not be found.
+     * @return The simplified structure or <code>null</code> if the absorption rule could not be found.
      */
     private @Nullable Formula nestedAndAbsorbtion(@NonNull Variable var, Conjunction conjunction) {
         Formula left = conjunction.getLeft();
@@ -392,11 +392,11 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
     
     /**
      * Checks and resolves a negated OR absorption.
-     * Does the following transformations:<br/>
-     * <pre><code>   !A &or; !(A &or; B)
+     * Does the following transformations:
+     * <pre>   !A &or; !(A &or; B)
      * &rarr; !(A &and; (A &or; B))
      * &rarr; !(A)
-     * &rarr; !A</code></pre>
+     * &rarr; !A</pre>
      * 
      * @param negatedVar The negated variable (<tt>!A</tt> in the example).
      * @param unpackedVar The variable without the negation (<tt>A</tt> in the example).
@@ -418,11 +418,11 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
     
     /**
      * Checks and resolves a negated OR complementation, identity, De Morgan.
-     * Does the following transformations:<br/>
-     * <pre><code>   !A &or; !(!A &or; B)
+     * Does the following transformations:
+     * <pre>   !A &or; !(!A &or; B)
      * &rarr; !A &or; (A &and; !B)          | De Morgan, Double Negation
      * &rarr; (!A &or; A) &and; (!A &or; !B)   | Distribution
-     * &rarr; (!A &or; !B)              | Complementation, Identity &or;</code></pre>
+     * &rarr; (!A &or; !B)              | Complementation, Identity &or;</pre>
      *
      * @param negatedVar The negated variable (<tt>!A</tt> in the example).
      * @param negatedDisjunction The disjunction to test (<tt>(A &or; B)</tt> in the example).
@@ -481,7 +481,7 @@ public class FormulaSimplificationVisitor implements IFormulaVisitor<@NonNull Fo
     }
     
     /**
-     * Tests and simplifies a nested or-absorption inside a disjunction. Will simplify<br/>
+     * Tests and simplifies a nested or-absorption inside a disjunction. Will simplify
      * <tt>A &or; (X &or; (A &and; B)</tt> to <tt>A &or; X</tt>
      * @param var The variable of a disjunction.
      * @param disjunction The disjunction to test (right side of the example).
