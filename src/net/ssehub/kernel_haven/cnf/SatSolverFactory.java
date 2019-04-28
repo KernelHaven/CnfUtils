@@ -76,14 +76,11 @@ public class SatSolverFactory {
     }
     
     /**
-     * <p>
      * Creates a SAT solver as specified in the configuration. By default, is Sat4j (unless configured otherwise).
-     * </p>
      * <p>
      * Optionally a base CNF can be passed to this call. This CNF will be used as a basis for each successive call
      * to isSatisfiable(). This version is more performant if the same CNF is checked against a lot
      * of other CNFs.
-     * </p>
      * 
      * @param cnf The base CNF. Leave this as <code>null</code> if no base CNF is wanted.
      * @param cached Whether to wrap a cache around this solver. If unsure, say <code>false</code> here.
@@ -106,14 +103,11 @@ public class SatSolverFactory {
     }
     
     /**
-     * <p>
      * Creates a SAT solver instance with the given type.
-     * </p>
      * <p>
      * Optionally a base CNF can be passed to this call. This CNF will be used as a basis for each successive call
      * to isSatisfiable(). This version is more performant if the same CNF is checked against a lot
      * of other CNFs.
-     * </p>
      * 
      * @param type The type of solver to create.
      * @param cnf The base CNF. Leave this as <code>null</code> if no base CNF is wanted.

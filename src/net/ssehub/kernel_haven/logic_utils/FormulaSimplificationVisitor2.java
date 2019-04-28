@@ -36,20 +36,16 @@ import net.ssehub.kernel_haven.util.logic.Variable;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
- * <p>
  * Creates a more concise formula based on the visited input formula.
  * If the formula cannot be simplified, the same instance is (sometimes) returned.
- * </p>
  * <p>
  * Applies rules of the <a href="https://en.wikipedia.org/wiki/Boolean_algebra#Laws">Boolean algebra</a> and
  * combinations of these rules.
- * </p>
  * <p>
  * This is based on {@link FormulaSimplificationVisitor}, but it uses
  * {@link FormulaStructureChecker#getAllConjunctionTerms(Conjunction)} and
  * {@link FormulaStructureChecker#getAllDisjunctionTerms(Disjunction)} to flatten dis- and conjunction hierarchies
  * before applying the rules.
- * </p>
  * 
  * @author Adam
  * @author El-Sharkawy
