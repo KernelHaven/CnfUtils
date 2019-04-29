@@ -54,7 +54,7 @@ public class VmToCnfConverterTest {
     public void testCompleteVariableUse() throws FormatException {
         // Preconditions
         Set<VariabilityVariable> set = new HashSet<VariabilityVariable>();
-        @NonNull String[] variables = {"ALPHA", "ALPHA_MODULE", "GAMMA", "BETA_MODULE", "BETA"};
+        @NonNull String[] variables = new @NonNull String[] {"ALPHA", "ALPHA_MODULE", "GAMMA", "BETA_MODULE", "BETA"};
         for (int i = 0; i < variables.length; i++) {
             set.add(new VariabilityVariable(variables[i], "bool", i + 1));
         }
