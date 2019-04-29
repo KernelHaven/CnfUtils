@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- author: Adam, Sascha El-Sharkawy -->
+<!-- Author: Adam, Sascha El-Sharkawy -->
 <project name="CnfUtils" default="jenkins" basedir=".">
 	<description>Utilities for Boolean formulas, including CNF converters and SAT solvers</description>
 
