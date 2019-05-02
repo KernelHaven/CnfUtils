@@ -8,7 +8,7 @@ Utilities for Boolean formulas, including CNF converters and a SAT solvers (base
 
 ## Usage
 
-Place [`CnfUtils.jar`](https://jenkins-2.sse.uni-hildesheim.de/view/KernelHaven/job/KH_CnfUtils/lastSuccessfulBuild/artifact/build/jar/CnfUtils.jar) in the plugins folder of KernelHaven.
+Place [`CnfUtils.jar`](https://jenkins-2.sse.uni-hildesheim.de/job/KH_CnfUtils/lastSuccessfulBuild/artifact/build/jar/CnfUtils.jar) in the plugins folder of KernelHaven.
 
 ## Dependencies
 
