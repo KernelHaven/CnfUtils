@@ -27,12 +27,10 @@ import net.ssehub.kernel_haven.cnf.ISatSolver;
 import net.ssehub.kernel_haven.cnf.SatSolverFactory;
 import net.ssehub.kernel_haven.cnf.SolverException;
 import net.ssehub.kernel_haven.util.PerformanceProbe;
-import net.ssehub.kernel_haven.util.logic.Conjunction;
 import net.ssehub.kernel_haven.util.logic.Disjunction;
 import net.ssehub.kernel_haven.util.logic.DisjunctionQueue;
 import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
-import net.ssehub.kernel_haven.util.logic.Negation;
 import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 import net.ssehub.kernel_haven.util.null_checks.Nullable;
@@ -259,78 +257,78 @@ public class SimplifyingDisjunctionQueue extends DisjunctionQueue {
         return result;
     }
 
-    /**
-     * Controls the recursion of {@link #checkRelevancy(Formula, Formula)},
-     * {@link #checkSubRelevancy(Formula, Formula, Formula)}. Maybe dis-/en-abled via {@link #USE_RECURSIVE_SPLIT}.
-     * @param notPrevious All previously relevant formulas, OR'd together, won't be touched, required for sat checks
-     *     (negated form, as only this is needed for SAT call, this should reduce unnecessary creation of objects).
-     * @param current The current element, which will be recursively split into smaller pieces as long either
-     *     a sub element is covered by previous or it cannot be cut into smaller pieces.
-     * 
-     * @return <tt>null</tt> if current does not contain any elements covered by previous or the remaining part which
-     *     must be added to previous (which does not contain the irrelevant part anymore).
-     * @throws ConverterException If CNF conversion fails.
-     * @throws SolverException If the SAT solver fails. 
-     */
-    private @Nullable SubRelevance recursiveRelevanceAnalysis(@NonNull Formula notPrevious, @NonNull Formula current)
-        throws SolverException, ConverterException {
-        
-        SubRelevance result = null;
-        if (current instanceof Disjunction) {
-            Formula left = ((Disjunction) current).getLeft();
-            Formula right = ((Disjunction) current).getRight();
-            
-            result = checkSubRelevancy(notPrevious, left, right);
-            if (null == result) {
-                result = checkSubRelevancy(notPrevious, right, left);
-            }
-        } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
-            // Transform: !(A AND B) into !A OR !B
-            Conjunction inner = (Conjunction) ((Negation) current).getFormula();
-            Formula left = inner.getLeft();
-            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
-            Formula right = inner.getRight();
-            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
-            
-            result = checkSubRelevancy(notPrevious, left, right);
-            if (null == result) {
-                result = checkSubRelevancy(notPrevious, right, left);
-            }
-        }
-        return result;
-    }
-    
-    /**
-     * Checks which of the given {@link Formula}s is relevant. recursive function, which aborts after the first match.
-     * 
-     * @param notPrevious All previously relevant formulas, OR'd together (negated form, as only this is needed for SAT
-     *     call, this should reduce unnecessary creation of objects).
-     * @param current A sub element of the new formula that will (possibly) be added (will be disjunction-wise split).
-     * @param base The other part of current, which must be added in case that current is irrelevant.
-     * 
-     * @return A relevant sub formula of current or <tt>null</tt> if the whole formula is relevant
-     * 
-     * @throws ConverterException If CNF conversion fails.
-     * @throws SolverException If the SAT solver fails. 
-     */
-    private @Nullable SubRelevance checkSubRelevancy(@NonNull Formula notPrevious, @NonNull Formula current,
-        @NonNull Formula base) throws SolverException, ConverterException {
-        
-        // Here we check only if the current formula (which covers a smaller configuration space) is covered by previous
-        SubRelevance result = null;
-        
-        // sat(!previous AND current)
-        if (solver.isSatisfiable(converter.convert(and(notPrevious, current)))) {
-            // true -> current is not subset of previous: continue recursion if possible
-            
-            // Recursion
-            result = recursiveRelevanceAnalysis(notPrevious, current);
-        } else {
-            // false -> current is subset of previous -> ignore current, keep base
-            result = new SubRelevance(base);
-        }
-        
-        return result;
-    }
+//    /**
+//     * Controls the recursion of {@link #checkRelevancy(Formula, Formula)},
+//     * {@link #checkSubRelevancy(Formula, Formula, Formula)}. Maybe dis-/en-abled via {@link #USE_RECURSIVE_SPLIT}.
+//     * @param notPrevious All previously relevant formulas, OR'd together, won't be touched, required for sat checks
+//     *     (negated form, as only this is needed for SAT call, this should reduce unnecessary creation of objects).
+//     * @param current The current element, which will be recursively split into smaller pieces as long either
+//     *     a sub element is covered by previous or it cannot be cut into smaller pieces.
+//     * 
+//     * @return <tt>null</tt> if current does not contain any elements covered by previous or the remaining part which
+//     *     must be added to previous (which does not contain the irrelevant part anymore).
+//     * @throws ConverterException If CNF conversion fails.
+//     * @throws SolverException If the SAT solver fails. 
+//     */
+//    private @Nullable SubRelevance recursiveRelevanceAnalysis(@NonNull Formula notPrevious, @NonNull Formula current)
+//        throws SolverException, ConverterException {
+//        
+//        SubRelevance result = null;
+//        if (current instanceof Disjunction) {
+//            Formula left = ((Disjunction) current).getLeft();
+//            Formula right = ((Disjunction) current).getRight();
+//            
+//            result = checkSubRelevancy(notPrevious, left, right);
+//            if (null == result) {
+//                result = checkSubRelevancy(notPrevious, right, left);
+//            }
+//        } else if (current instanceof Negation && ((Negation) current).getFormula() instanceof Conjunction) {
+//            // Transform: !(A AND B) into !A OR !B
+//            Conjunction inner = (Conjunction) ((Negation) current).getFormula();
+//            Formula left = inner.getLeft();
+//            left = (left instanceof Negation) ? ((Negation) left).getFormula() : new Negation(left);
+//            Formula right = inner.getRight();
+//            right = (right instanceof Negation) ? ((Negation) right).getFormula() : new Negation(right);
+//            
+//            result = checkSubRelevancy(notPrevious, left, right);
+//            if (null == result) {
+//                result = checkSubRelevancy(notPrevious, right, left);
+//            }
+//        }
+//        return result;
+//    }
+//    
+//    /**
+//     * Checks which of the given {@link Formula}s is relevant. recursive function, which aborts after the first match.
+//     * 
+//     * @param notPrevious All previously relevant formulas, OR'd together (negated form, as only this is needed for
+//     *     SAT call, this should reduce unnecessary creation of objects).
+//     * @param current A sub element of the new formula that will (possibly) be added (will be disjunction-wise split).
+//     * @param base The other part of current, which must be added in case that current is irrelevant.
+//     * 
+//     * @return A relevant sub formula of current or <tt>null</tt> if the whole formula is relevant
+//     * 
+//     * @throws ConverterException If CNF conversion fails.
+//     * @throws SolverException If the SAT solver fails. 
+//     */
+//    private @Nullable SubRelevance checkSubRelevancy(@NonNull Formula notPrevious, @NonNull Formula current,
+//        @NonNull Formula base) throws SolverException, ConverterException {
+//        
+//        //Here we check only if the current formula(which covers a smaller configuration space) is covered by previous
+//        SubRelevance result = null;
+//        
+//        // sat(!previous AND current)
+//        if (solver.isSatisfiable(converter.convert(and(notPrevious, current)))) {
+//            // true -> current is not subset of previous: continue recursion if possible
+//            
+//            // Recursion
+//            result = recursiveRelevanceAnalysis(notPrevious, current);
+//        } else {
+//            // false -> current is subset of previous -> ignore current, keep base
+//            result = new SubRelevance(base);
+//        }
+//        
+//        return result;
+//    }
     
 }
