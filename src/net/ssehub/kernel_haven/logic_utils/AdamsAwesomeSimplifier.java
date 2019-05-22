@@ -48,6 +48,12 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  * @author Adam
  */
 public class AdamsAwesomeSimplifier {
+
+    /**
+     * Don't allow any instances.
+     */
+    private AdamsAwesomeSimplifier() {
+    }
     
     /**
      * Moves all {@link Negation}s inwards as much as possible. After this, negations only occur around

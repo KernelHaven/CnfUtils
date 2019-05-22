@@ -36,6 +36,7 @@ import net.ssehub.kernel_haven.util.null_checks.NonNull;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+    AdamsAwesomeSimplifierTest.class,
     FormulaToExpressionConverterTest.class,
     LogicUtilsTest.class,
     SimplifyingDisjunctionQueueTest.class,
