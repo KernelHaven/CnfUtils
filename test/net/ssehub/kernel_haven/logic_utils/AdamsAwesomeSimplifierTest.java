@@ -79,6 +79,9 @@ public class AdamsAwesomeSimplifierTest {
             {and(not("A"), not("B")), and(not("A"), not("B"))},
             
             {or(or("C", "A"), or(or("A", "B"), or("C", "B"))), or(or("B", "C"), "A")},
+            
+            // this could be simplified further to and("A", not("B"))
+            {and("A", not(and("A", "B"))), and("A", not(and("A", "B")))},
         });
     }
     // CHECKSTYLE:ON
