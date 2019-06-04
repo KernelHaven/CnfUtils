@@ -32,7 +32,9 @@ import org.junit.runners.Parameterized.Parameters;
 
 import net.ssehub.kernel_haven.cnf.ConverterException;
 import net.ssehub.kernel_haven.cnf.SolverException;
+import net.ssehub.kernel_haven.util.logic.False;
 import net.ssehub.kernel_haven.util.logic.Formula;
+import net.ssehub.kernel_haven.util.logic.True;
 import net.ssehub.kernel_haven.util.null_checks.NonNull;
 
 /**
@@ -70,12 +72,13 @@ public class AdamsAwesomeSimplifierTest {
             {and("A", or("B", "C")), and("A", or("B", "C"))},
             {and("A", or("B", "C")), and("A", or("B", "C"))},
             
-            // these could be simplified further...
-            {and("A", not(or("B", "A"))), and(and("A", not("B")), not("A"))},
-            {or("A", not(and("B", "A"))), or(or("A", not("B")), not("A"))},
+            {and("A", not(or("B", "A"))), False.INSTANCE},
+            {or("A", not(and("B", "A"))), True.INSTANCE},
             
             {or(not("A"), not("B")), or(not("A"), not("B"))},
             {and(not("A"), not("B")), and(not("A"), not("B"))},
+            
+            {or(or("C", "A"), or(or("A", "B"), or("C", "B"))), or(or("B", "C"), "A")},
         });
     }
     // CHECKSTYLE:ON

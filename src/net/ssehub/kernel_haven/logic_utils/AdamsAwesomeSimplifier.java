@@ -197,9 +197,16 @@ public class AdamsAwesomeSimplifier {
         formula = moveNegationInwards(formula);
         p.close();
         
-        // Step 3: simple simplification
-        p = new PerformanceProbe("AAS: 3) Simple Simplification");
+        // Step 3.1: simple simplification
+        p = new PerformanceProbe("AAS: 3.1) Simple Simplification");
         formula = LogicUtils.simplifyWithVisitor(formula);
+        p.close();
+        
+        // Step 3.2: simple simplification
+        // run the FormulaSimplificationVisitor2 standalone, as the SubTreeSimplifier does not call it for
+        // the unmodified formula (i.e. no sub-trees replaced)
+        p = new PerformanceProbe("AAS: 3.2) Simple Simplification");
+        formula = new FormulaSimplificationVisitor2().visit(formula);
         p.close();
         
         // Step 4: sub-tree group simplifier
